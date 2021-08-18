@@ -19,6 +19,13 @@ class authentication():
             file = open('temp/api_domain', 'r')
             self.api_domain = file.read()
             file.close()
+            if len(self.api_domain) != 23:
+                if self.my_base == '':
+                    self.my_base = base()
+                self.api_domain = self.my_base.entry.notes
+                file = open('temp/api_domain', 'w')
+                file.write(self.api_domain)
+                file.close()
         self.headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         if os.path.exists('temp/cookies.json') is False:
             self.user_data = ''
@@ -92,11 +99,26 @@ class base():
         if len(kp.find_attachments(filename='credentials.json')) == 1:
             self.credentials = self.entry.attachments[0]
         elif len(kp.find_attachments(filename='credentials.json')) > 1:
-            print('решения, как быть дальше, пока нет')
+            try:
+                str(self.entry.attachments[0].data)
+            except Exception as e:
+                print(e)
+                print('\n\t>>>почисти историю записи и заходи снова<<<')
+                exit()
+            self.credentials = self.entry.attachments[0]
+        else:
+            print('не хватает файлика\n\n\tнайди credentials.json в рабочем чате')
+            exit()
+        try:
+            len_len = len(self.entry.notes)
+        except Exception as e:
+            print(e)
+            print('не хватает заметки')
             exit()
         else:
-            print('не хватает файлика')
-            exit()
+            if len_len != 23:
+                print('вместо заметки шляпа')
+                exit()
 
     def make_payload(self):
         if len(self.entry.custom_properties.keys()) == 1:    # если токен один
