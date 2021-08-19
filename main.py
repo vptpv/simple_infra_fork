@@ -1,4 +1,4 @@
-import json, os
+import json, platform
 import slave_of_lamp
 from pprint import pprint
 from sheets import read, write
@@ -94,6 +94,7 @@ def _zip():
     write._zip(values)
 
 if __name__ == '__main__':
-    print(chr(27) + "[2J")
+    if platform.system() != 'Windows':
+        print(chr(27) + "[2J")
     print('привет, друг!\n\t\tпоработаем?')
     dict_reader()
