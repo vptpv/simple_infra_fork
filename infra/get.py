@@ -77,7 +77,7 @@ def zip(auth):
     hw_models(auth)
     print('выгрузили данные о моделях')
     zip_os(auth)
-    print('выгрузили данные о серверах')
+    print('выгрузили данные об ОС')
     print('\nконец')
 
 def drop_down_list(list_2):
@@ -98,6 +98,8 @@ def drop_down_list(list_2):
 def zip_os(auth): #выгрузить список меток с моделями для VK
     conditions = {
         'select': [
+            "IsActual,",
+            "HardwareAddresses,",
             "AccountingId,",
             "HostName,",
             "SerialNumber,",
@@ -109,10 +111,13 @@ def zip_os(auth): #выгрузить список меток с моделям�
             "DataCenterName"
         ],
         'filter': [
-            "IsActual eq true",
-            " and HardwareTypeName eq 'Server'"
-            # " and OrgUnitName eq 'VK'",
-            # " and BalanceUnitName eq 'VKontakte'"
+            "IsActual eq true and HardwareSubTypeName eq 'Switch'",
+            " or ",
+            "IsActual eq true and HardwareSubTypeName eq 'DWDM'",
+            " or ",
+            "IsActual eq true and HardwareTypeName eq 'Server'",
+            " or ",
+            "IsActual eq true and HardwareTypeName eq 'Storage'",
         ]
     }
     select =''
@@ -128,10 +133,22 @@ def zip_os(auth): #выгрузить список меток с моделям�
     # дальше нужно писать
     for x in json_1:
         list_.append(json.loads(json.dumps(x)))
-    # print(list_[0])
+    # print(json_1)
+    # print(list_)
+    # exit()
     list_2 = []
     for x in list_:
-        y = [x.get('DataCenterName'),x.get('DataCenterLocationName'),x.get('SerialNumber'),x.get('AccountingId'),x.get('HardwareModelName'),x.get('HostName'),x.get('HardwareConfigurationName')]
+        y = [
+            x.get('DataCenterName'),
+            x.get('DataCenterLocationName'),
+            x.get('SerialNumber'),
+            x.get('AccountingId'),
+            x.get('HardwareModelName'),
+            x.get('HostName'),
+            x.get('HardwareConfigurationName'),
+            x.get('IsActual'),
+            str(x.get('HardwareAddresses'))
+            ]
         list_2.append(y)
     write.servers(list_2)
 
