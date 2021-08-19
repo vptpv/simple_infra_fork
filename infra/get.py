@@ -68,7 +68,14 @@ def zip(auth):
     for x in list_:
         sapMaterial = f"000{x.get('SAPMaterialNumber')}"
         sapMaterial = sapMaterial[-4:]
-        y = [sapMaterial,str(x.get('HardwareModelId')),f"{x.get('HardwareTypeName')} {x.get('HardwareSubTypeName')}",x.get('HardwareModelName'),x.get('Quantity'),x.get('DataCenterLocationName'),x.get('DataCenterName')]
+        y = [
+            sapMaterial,str(x.get('HardwareModelId')),
+            f"{x.get('HardwareTypeName')} {x.get('HardwareSubTypeName')}",
+            x.get('HardwareModelName'),
+            x.get('Quantity'),
+            x.get('DataCenterLocationName'),
+            x.get('DataCenterName')
+        ]
         list_2.append(y)
     write.stock(list_2)
     print('данные об остатках записаны')
@@ -126,7 +133,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
     filter_ =''
     for x in conditions['filter']:
         filter_ = filter_ + x
-    url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}"
+    url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=DataCenterLocationName desc"
     r = requests.get(url, cookies = auth.cookies)
     json_1 = json.loads(r.text)
     list_ = []
@@ -138,16 +145,17 @@ def zip_os(auth): #выгрузить список меток с моделям�
     # exit()
     list_2 = []
     for x in list_:
+        mac_address = x.get('HardwareAddresses')
         y = [
-            x.get('DataCenterName'),
-            x.get('DataCenterLocationName'),
-            x.get('SerialNumber'),
-            x.get('AccountingId'),
-            x.get('HardwareModelName'),
             x.get('HostName'),
+            mac_address[0] if len(mac_address) == 1 else len(mac_address) if len(mac_address) > 1 else '',
+            x.get('AccountingId'),
+            x.get('SerialNumber'),
+            x.get('HardwareModelName'),
             x.get('HardwareConfigurationName'),
-            x.get('IsActual'),
-            str(x.get('HardwareAddresses'))
+            x.get('DataCenterLocationName'),
+            x.get('DataCenterName'),
+            # x.get('IsActual'),
             ]
         list_2.append(y)
     write.servers(list_2)
