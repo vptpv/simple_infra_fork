@@ -121,10 +121,14 @@ def zip_os(auth): #выгрузить список меток с моделям�
             "IsActual eq true and HardwareSubTypeName eq 'Switch'",
             " or ",
             "IsActual eq true and HardwareSubTypeName eq 'DWDM'",
+            # " or ",
+            # "IsActual eq true and HardwareSubTypeName eq 'KVM Console'",
             " or ",
             "IsActual eq true and HardwareTypeName eq 'Server'",
             " or ",
             "IsActual eq true and HardwareTypeName eq 'Storage'",
+            " or ",
+            "IsActual eq true and HardwareTypeName eq 'Terminal'",
         ]
     }
     select =''

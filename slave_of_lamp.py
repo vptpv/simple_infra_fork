@@ -76,6 +76,7 @@ class base():
             'Linux': '~/', 'Darwin': '~/',
             'Windows': f"C:\\Users\\{getpass.getuser()}\\" # спасибо Хику за это
         }
+        print('\n\tищу базу данных...')
         result = list(Path(os.path.expanduser(home_path[platform.system()])).rglob("*.kdbx"))
         y = 1
         for i in result:
