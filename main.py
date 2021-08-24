@@ -96,5 +96,5 @@ def _zip():
 if __name__ == '__main__':
     if platform.system() != 'Windows':
         print(chr(27) + "[2J")
-    print('привет, друг!\n\t\tпоработаем?')
+    print('привет, друг!\n\t\tпоработаем?\n')
     dict_reader()
