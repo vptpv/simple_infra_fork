@@ -49,7 +49,7 @@ def zip(auth):
     filter_ =''
     for x in conditions:
         filter_ = filter_ + x
-    url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=HardwareModelName asc"
+    url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=DataCenterLocationName asc"
     r = requests.get(url, cookies = auth.cookies)
     json_1 = json.loads(r.text)
     dict_ = {}                  # этап 1 считаем
@@ -166,8 +166,8 @@ def zip_os(auth): #выгрузить список меток с моделям�
 
 def hw_models(auth):
     list_2 = []
-    # url = f"{auth.api_domain}/api/hardware-models?$select=Id,Name,SAPMaterialNumber"
-    url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType"
+    url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$filter=IsActual eq true&$orderby=SAPMaterialNumber asc"
+    # url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$orderby=SAPMaterialNumber asc"
     r = requests.get(url, cookies = auth.cookies)
     json_1 = json.loads(r.text)
     # pprint(json_1[0]['SubType'])
@@ -175,10 +175,10 @@ def hw_models(auth):
     for i in json_1:
         # print(i)
         string = [
-            i.get('Name'),
             f"0000{i.get('SAPMaterialNumber')}"[-4:],
             i.get('Id'),
-            f"{i.get('Type')['Name']} {i.get('SubType')['Name']}"
+            f"{i.get('Type')['Name']} {i.get('SubType')['Name']}",
+            i.get('Name')
         ]
         list_2.append(string)
     write.accounting(list_2,0)
