@@ -49,7 +49,7 @@ def zip(auth):
     filter_ =''
     for x in conditions:
         filter_ = filter_ + x
-    url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=DataCenterLocationName asc"
+    url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=HardwareModelName asc"
     r = requests.get(url, cookies = auth.cookies)
     json_1 = json.loads(r.text)
     dict_ = {}                  # этап 1 считаем
