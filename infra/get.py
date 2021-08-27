@@ -166,8 +166,8 @@ def zip_os(auth): #выгрузить список меток с моделям�
 
 def hw_models(auth):
     list_2 = []
-    url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$filter=IsActual eq true&$orderby=SAPMaterialNumber asc"
-    # url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$orderby=SAPMaterialNumber asc"
+    # url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$filter=IsActual eq true&$orderby=SAPMaterialNumber asc"
+    url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$orderby=SAPMaterialNumber desc"
     r = requests.get(url, cookies = auth.cookies)
     json_1 = json.loads(r.text)
     # pprint(json_1[0]['SubType'])
