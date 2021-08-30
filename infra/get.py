@@ -116,7 +116,8 @@ def zip_os(auth): #выгрузить список меток с моделям�
             "IsInTransit",",",
             "DataCenterLocationName",",",
             "DataCenterName",",",
-            "OrgUnitName",
+            "OrgUnitName",",",
+            "HostLinkedDateTime"
         ],
         'filter': [
             "IsActual eq true and HardwareSubTypeName eq 'Switch'",
@@ -157,6 +158,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
             x.get('DataCenterLocationName'),
             x.get('DataCenterName'),
             x.get('OrgUnitName'),
+            x.get('HostLinkedDateTime'),
             ]
         list_2.append(y)
     write.servers(list_2)
