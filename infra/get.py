@@ -105,17 +105,18 @@ def drop_down_list(list_2):
 def zip_os(auth): #выгрузить список меток с моделями для VK
     conditions = {
         'select': [
-            "IsActual,",
-            "HardwareAddresses,",
-            "AccountingId,",
-            "HostName,",
-            "SerialNumber,",
-            "HardwareModelName,",
-            "HardwareModelId,",
-            "HardwareConfigurationName,",
-            "IsInTransit,",
-            "DataCenterLocationName,",
-            "DataCenterName"
+            "IsActual",",",
+            "HardwareAddresses",",",
+            "AccountingId",",",
+            "HostName",",",
+            "SerialNumber",",",
+            "HardwareModelName",",",
+            "HardwareModelId",",",
+            "HardwareConfigurationName",",",
+            "IsInTransit",",",
+            "DataCenterLocationName",",",
+            "DataCenterName",",",
+            "OrgUnitName",
         ],
         'filter': [
             "IsActual eq true and HardwareSubTypeName eq 'Switch'",
@@ -141,12 +142,8 @@ def zip_os(auth): #выгрузить список меток с моделям�
     r = requests.get(url, cookies = auth.cookies)
     json_1 = json.loads(r.text)
     list_ = []
-    # дальше нужно писать
     for x in json_1:
         list_.append(json.loads(json.dumps(x)))
-    # print(json_1)
-    # print(list_)
-    # exit()
     list_2 = []
     for x in list_:
         mac_address = x.get('HardwareAddresses')
@@ -159,7 +156,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
             x.get('HardwareConfigurationName'),
             x.get('DataCenterLocationName'),
             x.get('DataCenterName'),
-            # x.get('IsActual'),
+            x.get('OrgUnitName'),
             ]
         list_2.append(y)
     write.servers(list_2)
