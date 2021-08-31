@@ -117,20 +117,11 @@ def zip_os(auth): #выгрузить список меток с моделям�
             "DataCenterLocationName",",",
             "DataCenterName",",",
             "OrgUnitName",",",
-            "HostLinkedDateTime"
+            "HostLinkedDateTime",",",
+            "Tasks"
         ],
         'filter': [
-            "IsActual eq true and HardwareSubTypeName eq 'Switch'",
-            " or ",
-            "IsActual eq true and HardwareSubTypeName eq 'DWDM'",
-            # " or ",
-            # "IsActual eq true and HardwareSubTypeName eq 'KVM Console'",
-            " or ",
-            "IsActual eq true and HardwareTypeName eq 'Server'",
-            " or ",
-            "IsActual eq true and HardwareTypeName eq 'Storage'",
-            " or ",
-            "IsActual eq true and HardwareTypeName eq 'Terminal'",
+            "IsActual eq true and IsAsset eq true ", # основные средства
         ]
     }
     select =''
@@ -148,16 +139,17 @@ def zip_os(auth): #выгрузить список меток с моделям�
     list_2 = []
     for x in list_:
         mac_address = x.get('HardwareAddresses')
+        pur_task = [task for task in x.get('Tasks') if task[0:3].lower() == "pur"]
         y = [
-            x.get('HostName'),
-            mac_address[0] if len(mac_address) == 1 else len(mac_address) if len(mac_address) > 1 else '',
             x.get('AccountingId'),
             x.get('SerialNumber'),
             x.get('HardwareModelName'),
+            pur_task[0] if len(pur_task) == 1 else '',
+            mac_address[0] if len(mac_address) == 1 else len(mac_address) if len(mac_address) > 1 else '',
             x.get('HardwareConfigurationName'),
-            x.get('DataCenterLocationName'),
-            x.get('DataCenterName'),
+            f"{x.get('DataCenterLocationName')} {x.get('DataCenterName')}" if x.get('DataCenterName') else x.get('DataCenterLocationName'),
             x.get('OrgUnitName'),
+            x.get('HostName'),
             x.get('HostLinkedDateTime'),
             ]
         list_2.append(y)
