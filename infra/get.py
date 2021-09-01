@@ -118,7 +118,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
             "DataCenterName",",",
             "OrgUnitName",",",
             "HostLinkedDateTime",",",
-            "Tasks"
+            "WorkTask",",","Tasks"
         ],
         'filter': [
             "IsActual eq true and IsAsset eq true ", # основные средства
@@ -140,6 +140,11 @@ def zip_os(auth): #выгрузить список меток с моделям�
     for x in list_:
         mac_address = x.get('HardwareAddresses')
         pur_task = [task for task in x.get('Tasks') if task[0:3].lower() == "pur"]
+        wor_task = [x.get('WorkTask')]
+        hot_task = [task for task in x.get('Tasks') if task.lower() == "vkeng-4274" or task.lower() == "vkeng-3623"]
+        # if len(hot_task) == 0:
+        #     hot_task = [task for task in x.get('Tasks') if task.lower() == "vkeng-3623"]
+        print(f"{x.get('SerialNumber')} {x.get('DataCenterLocationName')} hot: {hot_task} work: {wor_task}") if len(hot_task) == 1 and hot_task == wor_task else ''
         y = [
             x.get('AccountingId'),
             x.get('SerialNumber'),
@@ -149,7 +154,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
             x.get('HardwareConfigurationName'),
             f"{x.get('DataCenterLocationName')} {x.get('DataCenterName')}" if x.get('DataCenterName') else x.get('DataCenterLocationName'),
             x.get('OrgUnitName'),
-            x.get('HostName'),
+            hot_task[0] if len(hot_task) == 1 and hot_task == wor_task else f"{x.get('HostName')} {hot_task[0]}" if len(hot_task) == 1 and x.get('HostName') else x.get('HostName') if x.get('HostName') else f"{wor_task[0]} {hot_task[0]}" if len(hot_task) == 1 else '',
             x.get('HostLinkedDateTime'),
             ]
         list_2.append(y)
