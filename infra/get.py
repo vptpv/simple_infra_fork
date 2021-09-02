@@ -136,7 +136,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
     list_ = []
     for x in json_1:
         list_.append(json.loads(json.dumps(x)))
-    list_2 = []
+    list_2 = [[],[],[]]
     for x in list_:
         mac_address = x.get('HardwareAddresses')
         pur_task = [task for task in x.get('Tasks') if task[0:3].lower() == "pur"]
@@ -144,7 +144,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
         hot_task = [task for task in x.get('Tasks') if task.lower() == "vkeng-4274" or task.lower() == "vkeng-3623"]
         # if len(hot_task) == 0:
         #     hot_task = [task for task in x.get('Tasks') if task.lower() == "vkeng-3623"]
-        print(f"{x.get('SerialNumber')} {x.get('DataCenterLocationName')} hot: {hot_task} work: {wor_task}") if len(hot_task) == 1 and hot_task == wor_task else ''
+        mega_string = f"{x.get('SerialNumber')} {x.get('DataCenterLocationName')} hot: {hot_task} work: {wor_task}"
         y = [
             x.get('AccountingId'),
             x.get('SerialNumber'),
@@ -157,8 +157,11 @@ def zip_os(auth): #выгрузить список меток с моделям�
             hot_task[0] if len(hot_task) == 1 and hot_task == wor_task else f"{x.get('HostName')} {hot_task[0]}" if len(hot_task) == 1 and x.get('HostName') else x.get('HostName') if x.get('HostName') else f"{wor_task[0]} {hot_task[0]}" if len(hot_task) == 1 else '',
             x.get('HostLinkedDateTime'),
             ]
-        list_2.append(y)
-    write.servers(list_2)
+        list_2[0].append(y)
+        list_2[1].append(y) if len(hot_task) > 0 else ''; print(mega_string) if len(hot_task) > 0 else ''
+        '' if x.get('HostName') else list_2[2].append(y) if x.get('DataCenterLocationName').lower() == "icva" else ''
+    write.servers(list_2[0],0)
+    write.servers(list_2[1],1)
 
 def hw_models(auth):
     list_2 = []

@@ -21,7 +21,7 @@ sheets_data = {
     ],
     'servers':[ # файл с серверами
         '1LCzfHK38xDHcA6L0UYn0FzsR0LQ0cN5fVhCtOOFRX8U',
-        ['from_cmdb!A2:J']
+        ['from_cmdb!A2:J','Hot!A2:J']
     ],
     'temp':[ # work hard
         '1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w',

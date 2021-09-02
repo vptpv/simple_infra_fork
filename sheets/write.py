@@ -28,13 +28,13 @@ def accounting(values,number): # выгружает данные о матери
             spreadsheetId=sheets.sheets_data['stock'][0], range=sheets.sheets_data['stock'][1][0],
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
-def servers(values): # выгружает временные данные
+def servers(values,number): # 
     hh = sheets.mega_auth()
 
     body = {
         'values': values
     }
-    for xx in [sheets.sheets_data['servers'][1][0]]:
+    for xx in [sheets.sheets_data['servers'][1][int(number)]]:
         request = hh['service'].spreadsheets().values().clear(
             spreadsheetId=sheets.sheets_data['servers'][0], range=xx,
             body=hh['clear_values_request_body']).execute()
