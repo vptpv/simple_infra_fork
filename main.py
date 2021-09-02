@@ -44,50 +44,28 @@ def dict_reader():
         for x in option:
             print(f"\t{x}")
         answer = input('\nответ: ').strip()
-        if answer == '55':
-            get.zip(auth)
-        elif answer == '888':
-            kick.change_network_roles(auth, read.infra())
-        elif answer == '3':
-            kick.add_sn(auth, read.infra())
-        elif answer == '777':
-            kick.change_mac_addresses(auth, read.infra())
-        elif answer == '33':
-            get.sap_4_node(auth)
-        elif answer == '303':
-            get.vacant_sap_4_node(auth)
-        elif answer == '44':
-            get.sap_from_param(auth, read.infra(), 'name')
-        elif answer == '404':
-            get.sap_from_param(auth, read.infra(), 'serial')
-        elif answer == '101':
-            get.sn_from_sap(auth, read.infra())
-        elif answer == '1':
-            delete.hosts_by_sap(auth, read.infra())
-        elif answer == '11':
-            delete.hosts_by_name(auth, read.infra())
-        elif answer == '2':
-            kick.rename_hosts(auth, read.infra())
-        elif answer == '202':
-            kick.rename_sap(auth, read.infra())
-        elif answer == 'make':
-            make.switch(auth,read.infra())
-        elif answer == 'make2':
-            make.terminal(auth,read.infra())
-        elif answer == 'make3':
-            make.dwdm(auth,read.infra())
-        elif answer == '0make':
-            make.to_plan_node(auth, read.infra())
-        elif answer == '22':
-            kick.set_sap_id(auth, read.infra())
-        elif answer == 'жоско':
-            kick.hard_add_sn(auth, read.infra())
-        elif answer == 'get':
-            print(metod.get_fat_name(auth, str(input('\nимя ноды: ').strip())))
-        elif answer == '_zip':
-            _zip()
-        elif answer == 'read':
-            pprint(read.install())
+        get.zip(auth)                                                       if answer ==    '55' else ''
+        kick.change_network_roles(auth, read.infra())                       if answer ==   '888' else ''
+        kick.add_sn(auth, read.infra())                                     if answer ==     '3' else ''
+        kick.change_mac_addresses(auth, read.infra())                       if answer ==   '777' else ''
+        get.sap_4_node(auth)                                                if answer ==    '33' else ''
+        get.vacant_sap_4_node(auth)                                         if answer ==   '303' else ''
+        get.sap_from_param(auth, read.infra(), 'name')                      if answer ==    '44' else ''
+        get.sap_from_param(auth, read.infra(), 'serial')                    if answer ==   '404' else ''
+        get.sn_from_sap(auth, read.infra())                                 if answer ==   '101' else ''
+        delete.hosts_by_sap(auth, read.infra())                             if answer ==     '1' else ''
+        delete.hosts_by_name(auth, read.infra())                            if answer ==    '11' else ''
+        kick.rename_hosts(auth, read.infra())                               if answer ==     '2' else ''
+        kick.rename_sap(auth, read.infra())                                 if answer ==   '202' else ''
+        make.switch(auth,read.infra())                                      if answer ==  'make' else ''
+        make.terminal(auth,read.infra())                                    if answer == 'make2' else ''
+        make.dwdm(auth,read.infra())                                        if answer == 'make3' else ''
+        make.to_plan_node(auth, read.infra())                               if answer == '0make' else ''
+        kick.set_sap_id(auth, read.infra())                                 if answer ==    '22' else ''
+        kick.hard_add_sn(auth, read.infra())                                if answer == 'жоско' else ''
+        print(metod.get_fat_name(auth, str(input('\nимя ноды: ').strip()))) if answer ==   'get' else ''
+        _zip()                                                              if answer ==  '_zip' else ''
+        pprint(read.install())                                              if answer ==  'read' else ''
 
 def _zip():
     values = read._zip()
