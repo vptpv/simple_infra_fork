@@ -142,8 +142,6 @@ def zip_os(auth): #выгрузить список меток с моделям�
         pur_task = [task for task in x.get('Tasks') if task[0:3].lower() == "pur"]
         wor_task = [x.get('WorkTask')]
         hot_task = [task for task in x.get('Tasks') if task.lower() == "vkeng-4274" or task.lower() == "vkeng-3623"]
-        # if len(hot_task) == 0:
-        #     hot_task = [task for task in x.get('Tasks') if task.lower() == "vkeng-3623"]
         mega_string = f"{x.get('SerialNumber')} {x.get('DataCenterLocationName')} hot: {hot_task} work: {wor_task}"
         y = [
             x.get('AccountingId'),
@@ -158,10 +156,13 @@ def zip_os(auth): #выгрузить список меток с моделям�
             x.get('HostLinkedDateTime'),
             ]
         list_2[0].append(y)
-        list_2[1].append(y) if len(hot_task) > 0 else ''; print(mega_string) if len(hot_task) > 0 else ''
-        '' if x.get('HostName') else list_2[2].append(y) if x.get('DataCenterLocationName').lower() == "icva" else ''
+        # список горячих ОС
+        list_2[1].append(y) if len(hot_task) > 0 else ''#; print(mega_string) if len(hot_task) > 0 else ''
+        # список ОС на горячем складе
+        '' if x.get('IsInTransit') or x.get('HostName') or x.get('AccountingId')[0].lower() != "s" or len(hot_task) > 0 else list_2[2].append(y) if x.get('DataCenterLocationName').lower() == "icva" else ''
     write.servers(list_2[0],0)
     write.servers(list_2[1],1)
+    write.servers(list_2[2],2)
 
 def hw_models(auth):
     list_2 = []
