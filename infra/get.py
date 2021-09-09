@@ -1,6 +1,6 @@
 import requests, json
 from pprint import pprint
-from infra import kick
+from infra import kick, metod
 from sheets import write
 
 def sap_4_node(auth):
@@ -188,8 +188,9 @@ def hw_models(auth):
 def sap_from_param(auth, reader, param):
     for line in reader:
         params = {
-            'name': ['HostName',line['new_name']],
-            'serial': ['SerialNumber',line['serial']],
+            'name': ['HostName',metod.hostname(line['new_name'])],
+            # 'serial': ['SerialNumber',line['serial']],
+            'serial': ['SerialNumber',line.get('serial', 'none')],
             }
         url = f"{auth.api_domain}/api/hardware-items?$filter={params[param][0]} eq '{params[param][1]}'"
         r = requests.get(url, cookies = auth.cookies)
@@ -197,11 +198,11 @@ def sap_from_param(auth, reader, param):
         try:
             sapId = str(json_1[0]["AccountingId"])
         except IndexError:
-            print(f"{params[param][1]} - не в стойке")
+            print(f"{params[param][1]}\tне в стойке")
         except KeyError:
             pprint(json_1)
         else:
-            print(f"{sapId}\t{params[param][1]}")
+            print(f"{params[param][1]}\t{sapId}")
 
 def sn_from_sap(auth, reader):
     for line in reader:
