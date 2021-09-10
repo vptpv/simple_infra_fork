@@ -164,7 +164,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
             list_2[1].append(y) if len(hot_task) > 0 or x.get('HardwareModelName')[0:4] == "DDR4" else ''#; print(mega_string) if len(hot_task) > 0 else ''
             # список ОС на горячем складе
             '' if x.get('IsInTransit') or x.get('HostName') or x.get('AccountingId')[0].lower() != "s" or len(hot_task) > 0 else list_2[2].append(y) if x.get('DataCenterLocationName').lower() == "icva" else ''
-    write.hw_models(list_hw_models)
+    write.hw_models(list_hw_models,0)
     write.servers(list_2[0],0)
     write.servers(list_2[1],1)
     write.servers(list_2[2],2)

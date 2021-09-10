@@ -1,5 +1,4 @@
 # возможно, скоро пригодится
-
 def node_rename(reader):
     for line in reader:
         hostname_x = hostname(line['name'].strip())

@@ -1,5 +1,5 @@
 import json, platform
-import slave_of_lamp
+import slave_of_lamp, new_fu
 from pprint import pprint
 from sheets import read, write
 from infra import delete, metod, get, kick, make
@@ -34,6 +34,7 @@ option = [
         '  get. получить имя фата',
         ' _zip. учесть расходы из учёта',
         ' read. читаем список на планирование',
+        ' base. читаем базу',
     ]
 
 def dict_reader():
@@ -66,6 +67,7 @@ def dict_reader():
         print(metod.get_fat_name(auth, str(input('\nимя ноды: ').strip()))) if answer ==   'get' else ''
         _zip()                                                              if answer ==  '_zip' else ''
         pprint(read.install())                                              if answer ==  'read' else ''
+        new_fu.read_log()                                                   if answer ==  'base' else ''
 
 def _zip():
     values = read._zip()

@@ -36,7 +36,7 @@ sheets_data = {
     ],
     'hw_models':[ # учёт комплектующих
         '1ijPWH99k6B1mVCZ5WzuEFFPhQFrYh5UNXYOovk-Sj4Y',
-        ['Лист1!A2:E']
+        ['Лист1!A2:E','Лист4!A2:G']
     ]
 }
 
