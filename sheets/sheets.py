@@ -33,6 +33,10 @@ sheets_data = {
         '1qCvkrLOWw2rSmMZSEKnN62KPwagyw44hU--wqOwzb-g',
         [['materials!A3:D'],['materials!P3:Q']]
         # ['temp!A3:D']
+    ],
+    'hw_models':[ # учёт комплектующих
+        '1ijPWH99k6B1mVCZ5WzuEFFPhQFrYh5UNXYOovk-Sj4Y',
+        ['Лист1!A2:E']
     ]
 }
 

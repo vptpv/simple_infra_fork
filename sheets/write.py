@@ -58,6 +58,21 @@ def temp(values): # выгружает временные данные
             spreadsheetId=sheets.sheets_data['temp'][0], range=xx,
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
+def hw_models(values): # выгружает hw_models
+    hh = sheets.mega_auth()
+
+    body = {
+        'values': values
+    }
+    for xx in [sheets.sheets_data['hw_models'][1][0]]:
+        request = hh['service'].spreadsheets().values().clear(
+            spreadsheetId=sheets.sheets_data['hw_models'][0], range=xx,
+            body=hh['clear_values_request_body']).execute()
+
+        request = hh['service'].spreadsheets().values().update(
+            spreadsheetId=sheets.sheets_data['hw_models'][0], range=xx,
+            valueInputOption=hh['value_input_option'][0], body=body).execute()
+
 def stock(values): # выгружает данные по запасам
     hh = sheets.mega_auth()
     to_day_ta = datetime.datetime.today()

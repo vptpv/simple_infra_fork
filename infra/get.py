@@ -113,6 +113,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
             "HardwareModelName",",",
             "HardwareModelId",",",
             "HardwareConfigurationName",",",
+            "HardwareOriginalModelName",",",
             "IsInTransit",",",
             "DataCenterLocationName",",",
             "DataCenterName",",",
@@ -128,10 +129,9 @@ def zip_os(auth): #выгрузить список меток с моделям�
     select =''
     for x in conditions['select']:
         select = select + x
-    # filter_ =''
+    list_hw_models = []
     list_2 = [[],[],[]]
-    for x in conditions['filter']:
-        filter_ = x
+    for filter_ in conditions['filter']:
         url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=DataCenterLocationName desc"
         r = requests.get(url, cookies = auth.cookies)
         json_1 = json.loads(r.text)
@@ -157,11 +157,14 @@ def zip_os(auth): #выгрузить список меток с моделям�
                 hot_task[0] if len(hot_task) == 1 and hot_task == wor_task else f"{x.get('HostName')} {hot_task[0]}" if len(hot_task) == 1 and x.get('HostName') else x.get('HostName') if x.get('HostName') else f"{wor_task[0]} {hot_task[0]}" if len(hot_task) == 1 else '',
                 x.get('HostLinkedDateTime'),
                 ]
+            # список ОС с именами моделей
+            hw_model = [y[8],y[0],y[2],y[1],x.get('HardwareOriginalModelName')]; list_hw_models.append(hw_model)
             list_2[0].append(y) if x.get('HardwareModelName')[0:4] != "DDR4" else ''
             # список горячих ОС
             list_2[1].append(y) if len(hot_task) > 0 or x.get('HardwareModelName')[0:4] == "DDR4" else ''#; print(mega_string) if len(hot_task) > 0 else ''
             # список ОС на горячем складе
             '' if x.get('IsInTransit') or x.get('HostName') or x.get('AccountingId')[0].lower() != "s" or len(hot_task) > 0 else list_2[2].append(y) if x.get('DataCenterLocationName').lower() == "icva" else ''
+    write.hw_models(list_hw_models)
     write.servers(list_2[0],0)
     write.servers(list_2[1],1)
     write.servers(list_2[2],2)
