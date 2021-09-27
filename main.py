@@ -23,6 +23,7 @@ option = [
         '   44. получи сапметки по именам line(new_name)',
         '  404. получи сапметки по серийникам line(serial)',
         '  101. получить серийник по метке',
+        '  102. получить имя по метке',
         '    1. удалить хосты по меткам',
         '   11. удалить хосты по именам',
         '    2. переименовать хосты по именам',
@@ -54,6 +55,7 @@ def dict_reader():
         get.sap_from_param(auth, read.infra(), 'name')                      if answer ==    '44' else ''
         get.sap_from_param(auth, read.infra(), 'serial')                    if answer ==   '404' else ''
         get.sn_from_sap(auth, read.infra())                                 if answer ==   '101' else ''
+        get.host_from_sap(auth, read.infra())                               if answer ==   '102' else ''
         delete.hosts_by_sap(auth, read.infra())                             if answer ==     '1' else ''
         delete.hosts_by_name(auth, read.infra())                            if answer ==    '11' else ''
         kick.rename_hosts(auth, read.infra())                               if answer ==     '2' else ''

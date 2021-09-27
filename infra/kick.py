@@ -82,7 +82,8 @@ def add_sn(auth, reader): # вроде робит
                     url = f"{auth.api_domain}/api/accountings/{line['asset_tag'].upper()}/serial/{line['serial'].upper()}"
                     r = requests.put(url, cookies = auth.cookies)
                     if r.status_code == 200:
-                        print(f"\n{str(json_sap[0]['AccountingId'])}\t{line['serial']}\tстало хорошо")
+                        print('^', end='')
+                        # print(f"\n{str(json_sap[0]['AccountingId'])}\t{line['serial']}\tстало хорошо")
                         strong = f"{str(json_sap[0]['AccountingId'])}\t{line['serial']}\tстало хорошо"
                     else:
                         print(f"\n{line['asset_tag']}\t\tне дружелюбный ответ")

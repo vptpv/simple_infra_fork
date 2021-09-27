@@ -222,6 +222,16 @@ def sn_from_sap(auth, reader):
         else:
             print(f"{serialNumber}\t{line['asset_tag']}")
 
+def host_from_sap(auth, reader):
+    for line in reader:
+        data = {
+                'sapid': f"$filter=AccountingId eq '{line['asset_tag']}'"
+            }
+        url = f"{auth.api_domain}/api/hardware-items?{data['sapid']}"
+        r = requests.get(url, cookies = auth.cookies)
+        json_1 = json.loads(r.text)
+        print(str(json_1[0].get("HostName", "хуй")) + f"\t{line['asset_tag']}")
+
 def vacant_sap_4_node(auth):
     HardwareModelId = {
     '4U_FatTwin_G2_Node': 6118,
