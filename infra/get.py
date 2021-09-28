@@ -111,7 +111,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
             "HostName",",",
             "SerialNumber",",",
             "HardwareModelName",",",
-            "HardwareModelId",",",
+            "HardwareModelId",",","HardwareTypeName",",",
             "HardwareConfigurationName",",",
             "HardwareOriginalModelName",",",
             "IsInTransit",",",
@@ -157,8 +157,9 @@ def zip_os(auth): #выгрузить список меток с моделям�
                 hot_task[0] if len(hot_task) == 1 and hot_task == wor_task else f"{x.get('HostName')} {hot_task[0]}" if len(hot_task) == 1 and x.get('HostName') else x.get('HostName') if x.get('HostName') else f"{wor_task[0]} {hot_task[0]}" if len(hot_task) == 1 else '',
                 x.get('HostLinkedDateTime'),
                 ]
+            # список серверов с именами моделей
+            hw_model = [y[8],y[0],y[2],y[1],x.get('HardwareOriginalModelName')]; list_hw_models.append(hw_model) if x.get('HardwareTypeName') == "Server" else ''
             # список ОС с именами моделей
-            hw_model = [y[8],y[0],y[2],y[1],x.get('HardwareOriginalModelName')]; list_hw_models.append(hw_model)
             list_2[0].append(y) if x.get('HardwareModelName')[0:4] != "DDR4" else ''
             # список горячих ОС
             list_2[1].append(y) if len(hot_task) > 0 or x.get('HardwareModelName')[0:4] == "DDR4" else ''#; print(mega_string) if len(hot_task) > 0 else ''
