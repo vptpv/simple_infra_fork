@@ -34,7 +34,7 @@ sheets_data = {
         [['materials!A3:D'],['materials!P3:Q']]
         # ['temp!A3:D']
     ],
-    'hw_models':[ # учёт комплектующих
+    'hw_models':[ # 
         '1ijPWH99k6B1mVCZ5WzuEFFPhQFrYh5UNXYOovk-Sj4Y',
         ['Лист1!A2:E','Лист4!A2:G']
     ]

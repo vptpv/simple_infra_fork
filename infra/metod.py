@@ -19,12 +19,15 @@ def fat_name(host, rack_group):
     return hostname
 
 def hostname(host): # добавляет префикс хосту
-    if host[-6]=='5' or host[-6]=='6':
-        return 'eva' + host[-6:]
-    elif host[-6]=='2':
-        return 'cvt' + host[-6:]
-    elif host[-6]=='8':
-        return 'sdn' + host[-6:]
+    if len(host) > 5:
+        if host[-6]=='5' or host[-6]=='6':
+            return 'eva' + host[-6:]
+        elif host[-6]=='2':
+            return 'cvt' + host[-6:]
+        elif host[-6]=='8':
+            return 'sdn' + host[-6:]
+        else:
+            return host
     else:
         return host
 
