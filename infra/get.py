@@ -149,6 +149,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
                 x.get('AccountingId'),
                 x.get('SerialNumber'),
                 x.get('HardwareModelName'),
+                x.get('HardwareOriginalModelName'),
                 pur_task[0] if len(pur_task) == 1 else '',
                 mac_address[0] if len(mac_address) == 1 else len(mac_address) if len(mac_address) > 1 else '',
                 x.get('HardwareConfigurationName'),
@@ -158,7 +159,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
                 x.get('HostLinkedDateTime'),
                 ]
             # список серверов с именами моделей
-            hw_model = [y[8],y[0],y[2],y[1],x.get('HardwareOriginalModelName')]; list_hw_models.append(hw_model) if x.get('HardwareTypeName') == "Server" else ''
+            hw_model = [y[9],y[0],y[2],y[1],x.get('HardwareOriginalModelName')]; list_hw_models.append(hw_model) if x.get('HardwareTypeName') == "Server" else ''
             # список ОС с именами моделей
             list_2[0].append(y) if x.get('HardwareModelName')[0:4] != "DDR4" else ''
             # список горячих ОС
