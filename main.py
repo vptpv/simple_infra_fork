@@ -3,7 +3,7 @@ import slave_of_lamp, new_fu
 from pprint import pprint
 from sheets import read, write
 from infra import delete, metod, get, kick, make
-# from jira_ import j_read
+from jira_ import j_read
 
 auth = slave_of_lamp.authentication()
 
@@ -37,7 +37,7 @@ option = [
         ' _zip. учесть расходы из учёта',
         ' read. читаем список на планирование',
         ' base. читаем базу',
-        # ' jira. читаем таски на горячий зип',
+        ' jira. читаем таски на горячий зип',
     ]
 
 def dict_reader():
@@ -72,7 +72,7 @@ def dict_reader():
         _zip()                                                              if answer ==  '_zip' else ''
         pprint(read.install())                                              if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
-        # j_read.hot_zip()                                                    if answer ==  'jira' else ''
+        j_read.hot_zip()                                                    if answer ==  'jira' else ''
 
 def _zip():
     values = read._zip()
