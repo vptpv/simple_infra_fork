@@ -2,6 +2,7 @@ import requests, json
 from pprint import pprint
 from infra import kick, metod
 from sheets import write
+from jira_ import j_read
 
 def sap_4_node(auth):
     print('\tномер ряда')
@@ -103,6 +104,7 @@ def drop_down_list(list_2):
     write.accounting(list_, 1)
 
 def zip_os(auth): #выгрузить список меток с моделями для VK
+    hot_tasks = j_read.hot_zip()
     conditions = {
         'select': [
             "IsActual",",",
@@ -143,7 +145,10 @@ def zip_os(auth): #выгрузить список меток с моделям�
             mac_address = x.get('HardwareAddresses')
             pur_task = [task for task in x.get('Tasks') if task[0:3].lower() == "pur"]
             wor_task = [x.get('WorkTask')]
-            hot_task = [task for task in x.get('Tasks') if task.lower() == "vkeng-4274" or task.lower() == "vkeng-3623"]
+            hot_task = []
+            for task_ in hot_tasks:
+                ksat = [task for task in x.get('Tasks') if task.lower() == task_.lower()]
+                hot_task.append(ksat[0]) if len(ksat) == 1 else ''
             mega_string = f"{x.get('SerialNumber')} {x.get('DataCenterLocationName')} hot: {hot_task} work: {wor_task}"
             y = [
                 x.get('AccountingId'),
@@ -155,7 +160,8 @@ def zip_os(auth): #выгрузить список меток с моделям�
                 x.get('HardwareConfigurationName'),
                 f"{x.get('DataCenterLocationName')} {x.get('DataCenterName')}" if x.get('DataCenterName') else x.get('DataCenterLocationName'),
                 x.get('OrgUnitName'),
-                hot_task[0] if len(hot_task) == 1 and hot_task == wor_task else f"{x.get('HostName')} {hot_task[0]}" if len(hot_task) == 1 and x.get('HostName') else x.get('HostName') if x.get('HostName') else f"{wor_task[0]} {hot_task[0]}" if len(hot_task) == 1 else '',
+                # если есть только хот_таск        # если есть хост и  хот_таск                                                           # если есть только хост
+                str(hot_task) if len(hot_task) > 0 else f"{x.get('HostName')} {str(hot_task)}" if x.get('HostName') and len(hot_task) > 0 else x.get('HostName') if x.get('HostName') else '',
                 x.get('HostLinkedDateTime'),
                 ]
             # список серверов с именами моделей

@@ -44,6 +44,15 @@ class authentication():
             for i in data_ta:
                 file.write(i+'\n')
             file.close()
+        if os.path.exists('temp/jira_bot.json') is False:
+            if self.my_base == '':
+                self.my_base = base()
+            data_ta = str(self.my_base.jira_bot.data)
+            data_ta = data_ta[2:-1].split('\\n')
+            file = open('temp/jira_bot.json', 'w')
+            for i in data_ta:
+                file.write(i+'\n')
+            file.close()
 
     def check_access(self):
         url = f"{self.api_domain}/api/hosts?$filter=DataCenterRackName eq '604'&$top=1"
@@ -108,7 +117,7 @@ class base():
                 exit()
             self.credentials = self.entry.attachments[0]
         else:
-            print('не хватает файлика\n\n\tнайди credentials.json в рабочем чате')
+            print('не хватает файлика\n\n\tнайди credentials.json в конфлюенсе')
             exit()
         try:
             len_len = len(self.entry.notes)
@@ -120,6 +129,19 @@ class base():
             if len_len != 23:
                 print('вместо заметки шляпа')
                 exit()
+        if len(kp.find_attachments(filename='jira_bot.json')) == 1:
+            self.jira_bot = self.entry.attachments[1]
+        elif len(kp.find_attachments(filename='jira_bot.json')) > 1:
+            try:
+                str(self.entry.attachments[1].data)
+            except Exception as e:
+                print(e)
+                print('\n\t>>>почисти историю записи и заходи снова<<<')
+                exit()
+            self.jira_bot = self.entry.attachments[1]
+        else:
+            print('не хватает файлика\n\n\tнайди jira_bot.json в конфлюенсе')
+            exit()
 
     def make_payload(self):
         if len(self.entry.custom_properties.keys()) == 1:    # если токен один
