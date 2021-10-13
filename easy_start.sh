@@ -2,7 +2,7 @@
 
 git pull https://github.com/savelbl4/simple_infra
 
-pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib requests pykeepass
+pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib requests pykeepass atlassian-python-api
  # > /dev/null
 
 python3 main.py
