@@ -132,7 +132,7 @@ def zip_os(auth): #выгрузить список меток с моделям�
     for x in conditions['select']:
         select = select + x
     list_hw_models = []
-    list_2 = [[],[],[]]
+    list_2 = [[],[],[],[]]
     for filter_ in conditions['filter']:
         url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=DataCenterLocationName desc"
         r = requests.get(url, cookies = auth.cookies)
@@ -172,10 +172,17 @@ def zip_os(auth): #выгрузить список меток с моделям�
             list_2[1].append(y) if len(hot_task) > 0 or x.get('HardwareModelName')[0:4] == "DDR4" else ''#; print(mega_string) if len(hot_task) > 0 else ''
             # список ОС на горячем складе
             '' if x.get('IsInTransit') or x.get('HostName') or x.get('AccountingId')[0].lower() != "s" or len(hot_task) > 0 else list_2[2].append(y) if x.get('DataCenterLocationName').lower() == "icva" else ''
+            # список ОС проекты
+            huist = [
+                {'PUR-9778': '','PUR-9776': '','PUR-9781': '','PUR-13731': '','PUR-11657': '','PUR-11654': '','PUR-15860': '','PUR-11651': '','PUR-10070': '','PUR-10069': '','PUR-11646': ''},
+                [y[0],y[4],y[7],y[8],y[9]]
+            ]
+            list_2[3].append(huist[1]) if len(pur_task) == 1 and huist[0].get(pur_task[0], 'хуй') != 'хуй' else ''
     write.hw_models(list_hw_models,0)
     write.servers(list_2[0],0)
     write.servers(list_2[1],1)
     write.servers(list_2[2],2)
+    write.servers(list_2[3],3)
 
 def hw_models(auth):
     list_2 = []

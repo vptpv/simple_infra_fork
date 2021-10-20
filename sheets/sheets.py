@@ -21,8 +21,9 @@ sheets_data = {
     ],
     'servers':[ # файл с серверами
         '1LCzfHK38xDHcA6L0UYn0FzsR0LQ0cN5fVhCtOOFRX8U',
-        ['from_cmdb!A2:K','Hot!M2:W','Hot!A2:K']
-        # 0                1          2
+        ['from_cmdb!A2:K','Hot!M2:W','Hot!A2:K','Лист25!N2:R']
+        # 0                1          2          3
+        
     ],
     'temp':[ # work hard
         '1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w',
