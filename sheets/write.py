@@ -111,6 +111,22 @@ def stickers_data(values): # выгружает данные для наклее
             spreadsheetId=sheets.sheets_data['stickers_data'][0], range=xx,
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
+def another(values): # выгружает эназерпрожекторные осы
+    hh = sheets.mega_auth()
+    data = {
+            'accounting':{'id':sheets.sheets_data['accounting'][0],'range':sheets.sheets_data['accounting'][1][2],'body':{'values': values['accounting']}},
+            'servers':{'id':sheets.sheets_data['servers'][0],'range':sheets.sheets_data['servers'][1][3],'body':{'values': values['servers']}},
+        }
+    for xx in data.keys():
+        # print(type(xx))
+        request = hh['service'].spreadsheets().values().clear(
+            spreadsheetId=data[xx]['id'], range=data[xx]['range'],
+            body=hh['clear_values_request_body']).execute()
+
+        request = hh['service'].spreadsheets().values().update(
+            spreadsheetId=data[xx]['id'], range=data[xx]['range'],
+            valueInputOption=hh['value_input_option'][0], body=data[xx]['body']).execute()
+
 # def _zip(values): # фиксирует расход (не работает)
 #     hh = sheets.mega_auth()
 #     ranges = {

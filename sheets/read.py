@@ -30,22 +30,24 @@ def infra():
         # pprint(dick)
         return dick
 
-def _zip():
+def another():   #собираем словарь эназерпрожекторных тасков
     hh = sheets.mega_auth()
-    values = []
-    for xx in ['выгрузка!AD3:AG','выгрузка!AH3:AI']:
+    # for xx in ['another!A2:B']:
+    for xx in ['temp!A2:B']:
         request = hh['service'].spreadsheets().values().get(
-            spreadsheetId = sheets.sheets_data['stock'][0],
+            # spreadsheetId = sheets.sheets_data['servers'][0],
+            spreadsheetId = '1qCvkrLOWw2rSmMZSEKnN62KPwagyw44hU--wqOwzb-g',
             range = xx,
             valueRenderOption = hh['value_render_option'],
             dateTimeRenderOption = hh['date_time_render_option']).execute()
-        values.append(request.get('values', []))
-    # print(request)
+    values = request.get('values', [])
     if not values:
         print('No data found.')
     else:
-        # print(values)
-        return values
+        dick = {}
+        for row in values:
+            dick.update({row[0]:row[1]})
+        return dick
 
 def install():
     hh = sheets.mega_auth()

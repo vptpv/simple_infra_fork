@@ -21,7 +21,7 @@ sheets_data = {
     ],
     'servers':[ # файл с серверами
         '1LCzfHK38xDHcA6L0UYn0FzsR0LQ0cN5fVhCtOOFRX8U',
-        ['from_cmdb!A2:K','Hot!M2:W','Hot!A2:K','another!F2:J']
+        ['from_cmdb!A2:K','Hot!M2:W','Hot!A2:K','another!E2:J']
         # 0                1          2          3
 
     ],
@@ -30,15 +30,14 @@ sheets_data = {
         ['temp!A2:C']
     ],
     'accounting':[ # учёт комплектующих
-        # '1TsGxlL1gz6XgybYwjdhZ1zQaNr6L1qRoiMZG2Hrr7Q0',
         '1qCvkrLOWw2rSmMZSEKnN62KPwagyw44hU--wqOwzb-g',
-        [['materials!A3:D'],['materials!P3:Q']]
-        # ['temp!A3:D']
+        [['materials!A3:D'],['materials!P3:Q'],'materials!S3:T']
+        # 0                  1                 2
     ],
     'hw_models':[ # 
         '1ijPWH99k6B1mVCZ5WzuEFFPhQFrYh5UNXYOovk-Sj4Y',
         ['Лист1!A2:E','Лист4!A2:G']
-    ]
+    ],
 }
 
 def mega_auth():

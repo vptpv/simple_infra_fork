@@ -34,7 +34,7 @@ option = [
         '   22. присвоить метки set_sap_id(reader)',
         'жоско. добавить серийник жоско',
         '  get. получить имя фата',
-        ' _zip. учесть расходы из учёта',
+        # ' _zip. учесть расходы из учёта',
         ' read. читаем список на планирование',
         ' base. читаем базу',
         ' jira. читаем таски на горячий зип',
@@ -69,7 +69,7 @@ def dict_reader():
         kick.set_sap_id(auth, read.infra())                                 if answer ==    '22' else ''
         kick.hard_add_sn(auth, read.infra())                                if answer == 'жоско' else ''
         print(metod.get_fat_name(auth, str(input('\nимя ноды: ').strip()))) if answer ==   'get' else ''
-        _zip()                                                              if answer ==  '_zip' else ''
+        # _zip()                                                              if answer ==  '_zip' else ''
         pprint(read.install())                                              if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''

@@ -1,7 +1,7 @@
 import requests, json
 from pprint import pprint
 from infra import kick, metod
-from sheets import write
+from sheets import read, write
 from jira_ import j_read
 
 def sap_4_node(auth):
@@ -78,14 +78,10 @@ def zip(auth):
             x.get('DataCenterName')
         ]
         list_2.append(y)
-    write.stock(list_2)
-    print('данные об остатках записаны')
-    drop_down_list(list_2)
-    print('выпадающий список обновлён')
-    hw_models(auth)
-    print('выгрузили данные о моделях')
-    zip_os(auth)
-    print('выгрузили данные об ОС')
+    print('данные об остатках',end='');    write.stock(list_2);    print(' записаны')
+    print('выпадающий список',end='');     drop_down_list(list_2); print(' обновлён')
+    print('данные о моделях',end='');      hw_models(auth);        print(' выгрузили')
+    print('данные об ОС:\n',end='');       zip_os(auth);           print(' выгрузили')
     print('\nконец')
 
 def drop_down_list(list_2):
@@ -105,6 +101,7 @@ def drop_down_list(list_2):
 
 def zip_os(auth): #выгрузить список меток с моделями для VK
     hot_tasks = j_read.hot_zip()
+    ne_huist = read.another()
     conditions = {
         'select': [
             "IsActual",",",
@@ -132,7 +129,8 @@ def zip_os(auth): #выгрузить список меток с моделям�
     for x in conditions['select']:
         select = select + x
     list_hw_models = []
-    list_2 = [[],[],[],[]]
+    list_2 = [[],[],[],{'accounting':[],'servers':[]}]
+            # 0  1  2  3
     for filter_ in conditions['filter']:
         url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=DataCenterLocationName desc"
         r = requests.get(url, cookies = auth.cookies)
@@ -140,7 +138,6 @@ def zip_os(auth): #выгрузить список меток с моделям�
         list_ = []
         for x in json_1:
             list_.append(json.loads(json.dumps(x)))
-        # list_2 = [[],[],[]]
         for x in list_:
             mac_address = x.get('HardwareAddresses')
             pur_task = [task for task in x.get('Tasks') if task[0:3].lower() == "pur"]
@@ -173,16 +170,18 @@ def zip_os(auth): #выгрузить список меток с моделям�
             # список ОС на горячем складе
             '' if x.get('IsInTransit') or x.get('HostName') or x.get('AccountingId')[0].lower() != "s" or len(hot_task) > 0 else list_2[2].append(y) if x.get('DataCenterLocationName').lower() == "icva" else ''
             # список ОС проекты
-            huist = [
-                {'PUR-9778': '','PUR-9776': '','PUR-9781': '','PUR-13731': '','PUR-11657': '','PUR-11654': '','PUR-15860': '','PUR-11651': '','PUR-10070': '','PUR-10069': '','PUR-11646': ''},
-                [y[0],y[4],y[7],y[8],y[9]]
-            ]
-            list_2[3].append(huist[1]) if len(pur_task) == 1 and huist[0].get(pur_task[0], 'хуй') != 'хуй' else ''
-    write.hw_models(list_hw_models,0)
-    write.servers(list_2[0],0)
-    write.servers(list_2[1],1)
-    write.servers(list_2[2],2)
-    write.servers(list_2[3],3)
+            if len(pur_task) == 1 and ne_huist.get(pur_task[0], 'хуй') != 'хуй':
+                huist = [ne_huist.get(y[4]),y[0],y[4],y[7],y[8],y[9]]
+                #         #0                  1    2    3    4    5
+                list_2[3]['servers'].append(huist)
+                list_2[3]['accounting'].append([huist[1],huist[0]])
+            # list_2[3]['servers'].append(huist);list_2[3]['accounting'].append([huist[1],huist[0]]) if len(pur_task) == 1 and ne_huist.get(pur_task[0], 'хуй') != 'хуй' else ''
+    print('    список серверов с именами моделей',end='');    write.hw_models(list_hw_models,0);    print(' <---эрон дон доне')
+    print('    список ОС с именами моделей',end='');          write.servers(list_2[0],0);           print(' <---эрон дон доне')
+    print('    список горячих ОС',end='');                    write.servers(list_2[1],1);           print(' <---эрон дон доне')
+    print('    список ОС на горячем складе',end='');          write.servers(list_2[2],2);           print(' <---эрон дон доне')
+    print('    список ОС проекты',end='');                    write.another(list_2[3]);             print(' <---эрон дон доне')
+    # pprint(list_2[3]['servers'])
 
 def hw_models(auth):
     list_2 = []
