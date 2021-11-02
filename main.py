@@ -38,6 +38,7 @@ option = [
         ' read. читаем список на планирование',
         ' base. читаем базу',
         ' jira. читаем таски на горячий зип',
+        ' offi. спланировать хосты office_switch()',
     ]
 
 def dict_reader():
@@ -73,6 +74,7 @@ def dict_reader():
         pprint(read.install())                                              if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
+        make.office_switch(auth,read.o_infra())                             if answer ==  'offi' else ''
 
 def _zip():
     values = read._zip()

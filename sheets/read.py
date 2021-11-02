@@ -9,13 +9,32 @@ from google.oauth2.credentials import Credentials
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 spreadsheet_id = '1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w'
-range_name = ['InfraM!A1:E']
+range_name = ['InfraM!A1:E','InfraM!A1:H']
 
 def infra():
     hh = sheets.mega_auth()
 
     request = hh['service'].spreadsheets().values().get(
         spreadsheetId=spreadsheet_id, range=range_name[0],
+        valueRenderOption=hh['value_render_option'],
+        dateTimeRenderOption=hh['date_time_render_option']).execute()
+    values = request.get('values', [])
+    # print(request)
+    if not values:
+        print('No data found.')
+    else:   #собираем список словарей (массив хешей)
+        dick = []
+        for row in values[1:]:
+            string = dict(zip(values[0], row))
+            dick.append(string)
+        # pprint(dick)
+        return dick
+
+def o_infra():
+    hh = sheets.mega_auth()
+
+    request = hh['service'].spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=range_name[1],
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])

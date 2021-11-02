@@ -29,7 +29,7 @@ def switch(auth, reader):
     for line in reader:
         # print("бжж")
         url = f"{auth.api_domain}/api/hosts?$filter=DataCenterRackName eq '{line['new_name'][-4:]}'&$top=1"
-        r = requests.get(url, cookies = auth.cookie)
+        r = requests.get(url, cookies = auth.cookies)
         json_1 = json.loads(r.text)
         try:
             DataCenterId = json_1[0]["DataCenterId"]
@@ -40,11 +40,11 @@ def switch(auth, reader):
             print(f"что-то пошло не так")
         else:
             url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['new_name']}'"
-            r = requests.get(url, cookies = auth.cookie)
+            r = requests.get(url, cookies = auth.cookies)
             json_1 = json.loads(r.text)
             # из метки получаем необходимые данные
             url = f"{auth.api_domain}/api/hardware-items?$filter=AccountingId eq '{line['asset_tag']}'"
-            r = requests.get(url, cookies = auth.cookie)
+            r = requests.get(url, cookies = auth.cookies)
             json_2 = json.loads(r.text)
             HardwareModelId = json_2[0]['HardwareModelId']
             # pprint(json_2)
@@ -66,7 +66,7 @@ def switch(auth, reader):
                     "CustomHostName": line['new_name'], # имя хоста, обязательное поле
                     "NetworkRoles": [hh[HardwareModelId][0]], # список сетевых ролей, обязательное поле для NetworkType = 'Switch'
                 }
-                r = requests.post(url, cookies = auth.cookie, data=json.dumps(payload), headers = auth.headers)
+                r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
                 if r.status_code == 200:
                     print(f"создан")
                 else:
@@ -92,7 +92,7 @@ def terminal(auth, reader):
     array = []
     for line in reader:
         url = f"{auth.api_domain}/api/hosts?$filter=DataCenterRackName eq '{line['new_name'][-4:]}'&$top=1"
-        r = requests.get(url, cookies = auth.cookie)
+        r = requests.get(url, cookies = auth.cookies)
         json_1 = json.loads(r.text)
         try:
             DataCenterId = json_1[0]["DataCenterId"]
@@ -102,11 +102,11 @@ def terminal(auth, reader):
             print(f"что-то пошло не так")
         else:
             url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['new_name']}'"
-            r = requests.get(url, cookies = auth.cookie)
+            r = requests.get(url, cookies = auth.cookies)
             json_1 = json.loads(r.text)
             # из метки получаем необходимые данные
             url = f"{auth.api_domain}/api/hardware-items?$filter=AccountingId eq '{line['asset_tag']}'"
-            r = requests.get(url, cookies = auth.cookie)
+            r = requests.get(url, cookies = auth.cookies)
             json_2 = json.loads(r.text)
             HardwareModelId = json_2[0]['HardwareModelId']
             # pprint(json_2)
@@ -124,7 +124,7 @@ def terminal(auth, reader):
                     "Ip": line['old_name'], # сетевой адрес устройства; обязательное поле
                     "CustomHostName": line['new_name'], # имя хоста, обязательное поле
                 }
-                r = requests.post(url, cookies = auth.cookie, data=json.dumps(payload), headers = auth.headers)
+                r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
                 if r.status_code == 200:
                     print('готово')
                 else:
@@ -150,7 +150,7 @@ def node_hosts(auth, reader):
     for line in reader:
         # print("бжж")
         url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['old_name']}'"
-        r = requests.get(url, cookies = auth.cookie)
+        r = requests.get(url, cookies = auth.cookies)
         json_1 = json.loads(r.text)
         try:
             ParentHostId = json_1[0]["Id"]
@@ -171,7 +171,7 @@ def node_hosts(auth, reader):
                 "ParentHostId": ParentHostId,# - идентификатор blade-свича, обязательное поле для blade-сервера
                 "BladeSlotList": [1,2,3,4],# - идентификаторы слотов blade-свича, обязательное поле для blade-сервера
                 }
-            r = requests.post(url, cookies = auth.cookie, data=json.dumps(payload), headers = auth.headers)
+            r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
             if r.status_code == 200:
                 for x in [1,2,3,4]:
                     string_2 = {
@@ -193,7 +193,7 @@ def dwdm(auth, reader):
     for line in reader:
         # print("бжж")
         url = f"{auth.api_domain}/api/hosts?$filter=DataCenterRackName eq '{line['new_name'][-4:]}'&$top=1"
-        r = requests.get(url, cookies = auth.cookie)
+        r = requests.get(url, cookies = auth.cookies)
         json_1 = json.loads(r.text)
         try:
             DataCenterId = json_1[0]["DataCenterId"]
@@ -204,11 +204,11 @@ def dwdm(auth, reader):
             print(f"что-то пошло не так")
         else:
             url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['new_name']}'"
-            r = requests.get(url, cookies = auth.cookie)
+            r = requests.get(url, cookies = auth.cookies)
             json_1 = json.loads(r.text)
             # из метки получаем необходимые данные
             url = f"{auth.api_domain}/api/hardware-items?$filter=AccountingId eq '{line['asset_tag']}'"
-            r = requests.get(url, cookies = auth.cookie)
+            r = requests.get(url, cookies = auth.cookies)
             json_2 = json.loads(r.text)
             
             NetworkType = json_2[0]['HardwareSubTypeName']
@@ -230,7 +230,7 @@ def dwdm(auth, reader):
                     "CustomHostName": line['new_name'], # имя хоста, обязательное поле
                     # "NetworkRoles": [hh[HardwareModelId][0]], # список сетевых ролей, обязательное поле для NetworkType = 'Switch'
                 }
-                r = requests.post(url, cookies = auth.cookie, data=json.dumps(payload), headers = auth.headers)
+                r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
                 if r.status_code == 200:
                     print(f"создан")
                 else:
@@ -250,3 +250,103 @@ def dwdm(auth, reader):
                 }
                 array.append(string_2)
     pprint(array)
+
+def office_switch(auth, reader): # свичи в офис
+    array = []
+    hh = {
+        6704: ["edge",150],
+        6: ["mngt_row",250],
+        662: ["mngt_row",250]
+    }
+    address = ''
+    for line in reader:
+        if address == '':
+            address = f"188.1{int(int(line['task'][-4:-3])/2)}.{int(int(line['task'][-4:-3])/4)}.{int(int(line['task'][-3:])/20)}"
+        address = address.split('.')
+        address.append(str(int(address.pop(3))+1))
+        address = '.'.join(address)
+        print(address)
+        payload = {
+            "TemplateName": 'хуй', # имя шаблона (тип хоста), обязательное поле
+            "NetworkType": 'хуй', # тип устройства, соответствует атрибуту модели HardwareSubType, обязательное поле
+            "OrgUnitId": 'хуй', # для какого проекта создается хост (здесь и ниже используется уникальный идентификатор оргюнита в системе CMDB), обязательное поле
+            "HardwareModelId": 'хуй', # уникальный идентификатор модели в системе CMDB, обязательное поле
+            "InstallationTask": line['task'], # задача, по которой устанавливается оборудование, обязательное поле
+            "DataCenterId": 'хуй', # уникальный идентификатор датацентра в системе CMDB, обязательное поле
+            "DataCenterRackId": 'хуй', # уникальный идентификатор стойки в системе CMDB, обязательное поле
+            "FirstUnit": int(line['unit']), # номер первого юнита для установки в стойку, обязательное поле
+            "Ip": '192.192.188.168', # сетевой адрес устройства; обязательное поле
+            "CustomHostName": line['new_name'], # имя хоста, обязательное поле
+            "NetworkRoles": 'хуй', # список сетевых ролей, обязательное поле для NetworkType = 'Switch'
+        }
+        payload.update({'Ip':address})
+        # print("бжж")
+        url = "{}/api/hosts?$filter=DataCenterLocation eq '{}'&$top=1".format(
+            auth.api_domain,
+            line['new_name'][:2].upper()
+            )
+        r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+        # try:
+        payload.update({'DataCenterId': json_1[0].get('DataCenterId', 'хуй')})
+        payload.update({'OrgUnitId': json_1[0].get('OrgUnitId', 'хуй')})
+        if payload['DataCenterId'] == 'хуй' or payload['OrgUnitId'] == 'хуй':
+            print(f"что-то не так с локацией")
+        else:
+            url = "{}/api/data-centers/{}/rows".format(
+                auth.api_domain,
+                payload['DataCenterId']
+                )
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            for i in json_1:
+                if i.get('Name', 'хуй') == line['row'].upper():
+                    payload.update({'DataCenterRackId': i['RackIds'][int(line['rack'][-2:])-1]})
+            if payload['DataCenterRackId'] == 'хуй':
+                print(f"что-то не так cо стойкой")
+            else:
+                url = "{}/api/hosts?$filter=HostName eq '{}'".format(
+                    auth.api_domain,
+                    line['new_name']
+                    )
+                r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+                if len(json_1) == 0:
+                    # из метки получаем необходимые данные
+                    url = "{}/api/hardware-items?$filter=AccountingId eq '{}'".format(
+                        auth.api_domain,
+                        line['asset_tag']
+                        )
+                    r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+                    payload.update({'TemplateName': json_1[0]['HardwareTypeName']})
+                    payload.update({'NetworkType': json_1[0]['HardwareSubTypeName']})
+                    payload.update({'HardwareModelId': json_1[0]['HardwareModelId']})
+                    # чекаем атрибуты
+                    url = "{}/api/hardware-models?$top=1&$expand=Attributes&$filter=Name eq '{}'".format(
+                        auth.api_domain,
+                        json_1[0]['HardwareModelName']
+                        )
+                    r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+                    # вынимаем роль
+                    for i in json_1[0]['Attributes']:
+                        if i.get('Name', 'хуй') == 'Network Roles':
+                            payload.update({'NetworkRoles': [].append(i.get('TextValue').split()[0]) if len(i.get('TextValue')) > 0 else []})
+                    # pprint(payload)
+                    print(f"{line['new_name']} - создаём")
+                    url = f"{auth.api_domain}/api/hosts"
+                    r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
+                    if r.status_code == 200:
+                        print(f"создан")
+                    else:
+                        print(f"{r.status_code}\t'{json.loads(r.text)['Message']}'")
+                        string_2 = {
+                            'new_name': line['new_name'],
+                            'task': json.loads(r.text)['Message']
+                        }
+                        array.append(string_2)
+                else:
+                    # print(json_1)
+                    string_2 = {
+                        'new_name': line['new_name'],
+                        'task': "уже есть"
+                    }
+                    array.append(string_2)
+    pprint(array)
+    # rename_hosts(array)
