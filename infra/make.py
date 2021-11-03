@@ -261,34 +261,65 @@ def office_switch(auth, reader): # свичи в офис
     address = ''
     for line in reader:
         if address == '':
-            address = f"188.1{int(int(line['task'][-4:-3])/2)}.{int(int(line['task'][-4:-3])/4)}.{int(int(line['task'][-3:])/20)}"
+            address = f"18.1{int(int(line['task'][-4:-3])/2)}.{int(int(line['task'][-4:-3])/4)}.{int(int(line['task'][-3:])/20)}"
         address = address.split('.')
         address.append(str(int(address.pop(3))+1))
         address = '.'.join(address)
         print(address)
         payload = {
-            "TemplateName": 'хуй', # имя шаблона (тип хоста), обязательное поле
-            "NetworkType": 'хуй', # тип устройства, соответствует атрибуту модели HardwareSubType, обязательное поле
-            "OrgUnitId": 'хуй', # для какого проекта создается хост (здесь и ниже используется уникальный идентификатор оргюнита в системе CMDB), обязательное поле
-            "HardwareModelId": 'хуй', # уникальный идентификатор модели в системе CMDB, обязательное поле
-            "InstallationTask": line['task'], # задача, по которой устанавливается оборудование, обязательное поле
-            "DataCenterId": 'хуй', # уникальный идентификатор датацентра в системе CMDB, обязательное поле
-            "DataCenterRackId": 'хуй', # уникальный идентификатор стойки в системе CMDB, обязательное поле
-            "FirstUnit": int(line['unit']), # номер первого юнита для установки в стойку, обязательное поле
-            "Ip": '192.192.188.168', # сетевой адрес устройства; обязательное поле
-            "CustomHostName": line['new_name'], # имя хоста, обязательное поле
-            "NetworkRoles": 'хуй', # список сетевых ролей, обязательное поле для NetworkType = 'Switch'
+            'TemplateName': 'хуй', # имя шаблона (тип хоста), обязательное поле
+            'NetworkType': 'хуй', # тип устройства, соответствует атрибуту модели HardwareSubType, обязательное поле
+            'OrgUnitId': 'хуй', # для какого проекта создается хост (здесь и ниже используется уникальный идентификатор оргюнита в системе CMDB), обязательное поле
+            'HardwareModelId': 'хуй', # уникальный идентификатор модели в системе CMDB, обязательное поле
+            'InstallationTask': line['task'], # задача, по которой устанавливается оборудование, обязательное поле
+            'DataCenterId': 'хуй', # уникальный идентификатор датацентра в системе CMDB, обязательное поле
+            'DataCenterRackId': 'хуй', # уникальный идентификатор стойки в системе CMDB, обязательное поле
+            'FirstUnit': int(line['unit']), # номер первого юнита для установки в стойку, обязательное поле
+            'Ip': '192.192.188.168', # сетевой адрес устройства; обязательное поле
+            'CustomHostName': line['new_name'], # имя хоста, обязательное поле
+            'NetworkRoles': 'хуй', # список сетевых ролей, обязательное поле для NetworkType = 'Switch'
         }
         payload.update({'Ip':address})
-        # print("бжж")
         url = "{}/api/hosts?$filter=DataCenterLocation eq '{}'&$top=1".format(
             auth.api_domain,
-            line['new_name'][:2].upper()
+            line['new_name'].split('-')[0].upper()
             )
         r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
-        # try:
-        payload.update({'DataCenterId': json_1[0].get('DataCenterId', 'хуй')})
-        payload.update({'OrgUnitId': json_1[0].get('OrgUnitId', 'хуй')})
+
+        if len(json_1) == 0:
+            # получаем номер локации
+            url = "{}/api/data-center-locations?$filter=Name eq '{}'".format(
+                auth.api_domain,
+                line['new_name'].split('-')[0].upper()
+                )
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            # получаем номер нужного цода в локации
+            url = "{}/api/data-center-locations/{}/data-centers".format(
+                auth.api_domain,
+                json_1[0].get('Id', 'хуй')
+                )
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            # пишем
+            payload.update({'DataCenterId': json_1[0].get('Id', 'хуй')})
+            # получаем ряд
+            url = "{}/api/data-centers/{}/rows?$top=1".format(
+                auth.api_domain,
+                json_1[0].get('Id', 'хуй')
+                )
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            # получаем стойку
+            url = "{}/api/data-centers/rows/{}/racks?$filter=Name eq '{}'".format(
+                auth.api_domain,
+                json_1[0].get('Id', 'хуй'),
+                line['rack']
+                )
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            # пишем
+            payload.update({'OrgUnitId': json_1[0].get('OrgUnits', 'хуй')[0]})
+        else:
+            payload.update({'DataCenterId': json_1[0].get('DataCenterId', 'хуй')})
+            payload.update({'OrgUnitId': json_1[0].get('OrgUnitId', 'хуй')})
+
         if payload['DataCenterId'] == 'хуй' or payload['OrgUnitId'] == 'хуй':
             print(f"что-то не так с локацией")
         else:
@@ -299,7 +330,7 @@ def office_switch(auth, reader): # свичи в офис
             r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
             for i in json_1:
                 if i.get('Name', 'хуй') == line['row'].upper():
-                    payload.update({'DataCenterRackId': i['RackIds'][int(line['rack'][-2:])-1]})
+                    payload.update({'DataCenterRackId': i['RackIds'][int(line['rack'].split(' ')[0][-2:])-1]})
             if payload['DataCenterRackId'] == 'хуй':
                 print(f"что-то не так cо стойкой")
             else:
@@ -318,6 +349,7 @@ def office_switch(auth, reader): # свичи в офис
                     payload.update({'TemplateName': json_1[0]['HardwareTypeName']})
                     payload.update({'NetworkType': json_1[0]['HardwareSubTypeName']})
                     payload.update({'HardwareModelId': json_1[0]['HardwareModelId']})
+                    payload.update({'BalanceUnitId': int(json_1[0]['BalanceUnitId'])})
                     # чекаем атрибуты
                     url = "{}/api/hardware-models?$top=1&$expand=Attributes&$filter=Name eq '{}'".format(
                         auth.api_domain,
@@ -327,15 +359,19 @@ def office_switch(auth, reader): # свичи в офис
                     # вынимаем роль
                     for i in json_1[0]['Attributes']:
                         if i.get('Name', 'хуй') == 'Network Roles':
-                            payload.update({'NetworkRoles': [].append(i.get('TextValue').split()[0]) if len(i.get('TextValue')) > 0 else []})
-                    # pprint(payload)
+                            payload.update({'NetworkRoles': [i.get('TextValue').split(', ')[0]]})
                     print(f"{line['new_name']} - создаём")
                     url = f"{auth.api_domain}/api/hosts"
                     r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
                     if r.status_code == 200:
                         print(f"создан")
+                    elif r.status_code == 400 and json.loads(r.text)['Message'].split(' ')[0] == 'Another':
+                        print(json.loads(r.text)['Message'])
+                        # sleep()
+                        # r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
                     else:
                         print(f"{r.status_code}\t'{json.loads(r.text)['Message']}'")
+                        pprint(payload)
                         string_2 = {
                             'new_name': line['new_name'],
                             'task': json.loads(r.text)['Message']
