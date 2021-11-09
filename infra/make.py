@@ -253,6 +253,7 @@ def dwdm(auth, reader):
 
 def office_switch(auth, reader): # свичи в офис
     array = []
+    array_ok = []
     hh = {
         6704: ["edge",150],
         6: ["mngt_row",250],
@@ -260,12 +261,16 @@ def office_switch(auth, reader): # свичи в офис
     }
     address = ''
     for line in reader:
+        if line.get('unit', 'хуй') == 'хуй':
+            line.update({'row': line['new_name'][3:6]})
+            line.update({'rack': line['new_name'][3:7]})
+        # чешем адрес
         if address == '':
-            address = f"18.1{int(int(line['task'][-4:-3])/2)}.{int(int(line['task'][-4:-3])/4)}.{int(int(line['task'][-3:])/20)}"
+            address = f"182.1{int(int(line['task'][-4:-3])/2)}.{int(int(line['task'][-4:-3])/4)}.{int(int(line['task'][-3:])/20)}"
         address = address.split('.')
         address.append(str(int(address.pop(3))+1))
         address = '.'.join(address)
-        print(address)
+        # print(address)
         payload = {
             'TemplateName': 'хуй', # имя шаблона (тип хоста), обязательное поле
             'NetworkType': 'хуй', # тип устройства, соответствует атрибуту модели HardwareSubType, обязательное поле
@@ -274,18 +279,32 @@ def office_switch(auth, reader): # свичи в офис
             'InstallationTask': line['task'], # задача, по которой устанавливается оборудование, обязательное поле
             'DataCenterId': 'хуй', # уникальный идентификатор датацентра в системе CMDB, обязательное поле
             'DataCenterRackId': 'хуй', # уникальный идентификатор стойки в системе CMDB, обязательное поле
-            'FirstUnit': int(line['unit']), # номер первого юнита для установки в стойку, обязательное поле
-            'Ip': '192.192.188.168', # сетевой адрес устройства; обязательное поле
-            'CustomHostName': line['new_name'], # имя хоста, обязательное поле
-            'NetworkRoles': 'хуй', # список сетевых ролей, обязательное поле для NetworkType = 'Switch'
         }
-        payload.update({'Ip':address})
-        url = "{}/api/hosts?$filter=DataCenterLocation eq '{}'&$top=1".format(
-            auth.api_domain,
-            line['new_name'].split('-')[0].upper()
-            )
-        r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+        if line['new_name'][:3] == 'eva':
+            url = "{}/api/hosts?$filter=DataCenterRackName eq '{}'&$top=1".format(
+                auth.api_domain,
+                line['rack']
+                )
+            # print(url)
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            line.update({'unit': metod.position(line['new_name'], json_1[0].get('DataCenterName', 'хуй'))})
+            payload.update({'HostQuantity': 1})
+            payload.update({'DataCenterRowId': json_1[0].get('DataCenterRowId', 'хуй')})
+            payload.update({'DataCenterRackId': json_1[0].get('DataCenterRackId', 'хуй')})
 
+        else:
+            payload.update({'CustomHostName': line['new_name']})
+            if line['new_name'].split('-')[0].upper() == 'FT':
+                loca_tion = line['new_name'].split('-')[1].upper()
+            else:
+                loca_tion = line['new_name'].split('-')[0].upper()
+            url = "{}/api/hosts?$filter=DataCenterLocation eq '{}' and DataCenterRowName eq '{}'&$top=1".format(
+                auth.api_domain,
+                loca_tion,
+                line['row'],
+                )
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+        payload.update({'FirstUnit': int(line['unit'])})
         if len(json_1) == 0:
             # получаем номер локации
             url = "{}/api/data-center-locations?$filter=Name eq '{}'".format(
@@ -318,7 +337,14 @@ def office_switch(auth, reader): # свичи в офис
             payload.update({'OrgUnitId': json_1[0].get('OrgUnits', 'хуй')[0]})
         else:
             payload.update({'DataCenterId': json_1[0].get('DataCenterId', 'хуй')})
-            payload.update({'OrgUnitId': json_1[0].get('OrgUnitId', 'хуй')})
+            url = "{}/api/data-centers/rows/{}/racks?$filter=Name eq '{}'".format(
+                auth.api_domain,
+                json_1[0].get('DataCenterRowId', 'хуй'),
+                line['rack']
+                )
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            # пишем
+            payload.update({'OrgUnitId': json_1[0]['OrgUnits'][0]})
 
         if payload['DataCenterId'] == 'хуй' or payload['OrgUnitId'] == 'хуй':
             print(f"что-то не так с локацией")
@@ -327,9 +353,10 @@ def office_switch(auth, reader): # свичи в офис
                 auth.api_domain,
                 payload['DataCenterId']
                 )
+            # print(url)
             r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
             for i in json_1:
-                if i.get('Name', 'хуй') == line['row'].upper():
+                if i.get('Name', 'хуй') == line['row'].upper() and payload['DataCenterRackId'] == 'хуй':
                     payload.update({'DataCenterRackId': i['RackIds'][int(line['rack'].split(' ')[0][-2:])-1]})
             if payload['DataCenterRackId'] == 'хуй':
                 print(f"что-то не так cо стойкой")
@@ -350,23 +377,33 @@ def office_switch(auth, reader): # свичи в офис
                     payload.update({'NetworkType': json_1[0]['HardwareSubTypeName']})
                     payload.update({'HardwareModelId': json_1[0]['HardwareModelId']})
                     payload.update({'BalanceUnitId': int(json_1[0]['BalanceUnitId'])})
-                    # чекаем атрибуты
-                    url = "{}/api/hardware-models?$top=1&$expand=Attributes&$filter=Name eq '{}'".format(
-                        auth.api_domain,
-                        json_1[0]['HardwareModelName']
-                        )
-                    r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
-                    # вынимаем роль
-                    for i in json_1[0]['Attributes']:
-                        if i.get('Name', 'хуй') == 'Network Roles':
-                            payload.update({'NetworkRoles': [i.get('TextValue').split(', ')[0]]})
-                    print(f"{line['new_name']} - создаём")
+                    if payload.get('TemplateName') == 'Network':
+                        payload.update({'Ip':address})
+                        # чекаем атрибуты
+                        url = "{}/api/hardware-models?$top=1&$expand=Attributes&$filter=Name eq '{}'".format(
+                            auth.api_domain,
+                            json_1[0]['HardwareModelName']
+                            )
+                        r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+                        # вынимаем роль
+                        for i in json_1[0]['Attributes']:
+                            if i.get('Name', 'хуй') == 'Network Roles':
+                                payload.update({'NetworkRoles': [i.get('TextValue').split(',')[0].strip()]})
+                    if payload.get('TemplateName') == 'Blade':
+                        # по хорошему стоит проверить ноды на складе но пока так
+                        payload.update({'BladeServerHardwareModelId': 6119})
+                    # print(f"{line['new_name']}\t{line['unit']}\t")
+                    # pprint(payload)
+                    print(f"{line['new_name']}\t{line['unit']}\t",end='')
                     url = f"{auth.api_domain}/api/hosts"
                     r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
                     if r.status_code == 200:
-                        print(f"создан")
-                    elif r.status_code == 400 and json.loads(r.text)['Message'].split(' ')[0] == 'Another':
-                        print(json.loads(r.text)['Message'])
+                        old_name = json.loads(r.text)[0]['Name']
+                        print(old_name)
+                        # print(f"создан")
+                        array_ok.append([old_name, line['new_name']])
+                    # elif r.status_code == 400 and json.loads(r.text)['Message'].split(' ')[0] == 'Another':
+                    #     print(json.loads(r.text)['Message'])
                         # sleep()
                         # r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
                     else:
@@ -378,11 +415,12 @@ def office_switch(auth, reader): # свичи в офис
                         }
                         array.append(string_2)
                 else:
-                    # print(json_1)
+                    print(f"{line['new_name']}\tуже есть")
                     string_2 = {
                         'new_name': line['new_name'],
                         'task': "уже есть"
                     }
                     array.append(string_2)
     pprint(array)
+    write.temp(array_ok)
     # rename_hosts(array)
