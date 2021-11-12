@@ -56,3 +56,23 @@ def first_unit(host, rack_group): # определяет позицию в ст�
     elif rack_group[0:5] == 'icva_':
         if host[-6:-2] == '5980' or host[-6:-2] == '5981' or host[-6:-2] == '5982':#стойки лабы
             return 1
+
+def rack_group(row):
+    number_ = int(int(row[-2:])/4)
+    if row[0] == '5':
+        first = 'ICVA1_'; second = f"0{number_}"[-2:]
+    elif row[0] == '6' and number_ <= 4:
+        first = 'ICVA2_'; second = str(number_)
+    elif row[0] == '6' and number_ > 4:
+        first = 'ICVA3_'
+        number_ = int(number_ - 4); second = str(number_)
+    return first + second
+
+def get_location(host, host_type):
+    if host_type == 'Network':
+        rack = host.split('-')[-1].upper()
+    else:
+        rack = host[-6:-2]
+    row = rack[:-1]
+    group = rack_group(row)
+    return [group[:4],group,row,rack]
