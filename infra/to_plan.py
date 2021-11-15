@@ -3,6 +3,15 @@ from pprint import pprint
 from infra import metod, kick
 from sheets import write
 
+def get_hwmodelid():
+    # по хорошему стоит проверять ноды на складе но пока так
+    return 6119
+
+def get_ip_address():
+    # нужно как-то научиться чекать свободные адреса
+    string = '192.168.0.0'
+    return string
+
 def get_data_from_host(auth, hostname, payload):
     loca,group,row,rack = metod.get_location(hostname, payload.get('TemplateName'))
     # получаем номер локации:
@@ -34,7 +43,7 @@ def get_data_from_host(auth, hostname, payload):
     r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
                                                                                     # номер ряда
     DataCenterRowId = json_1[0].get('Id', 'хуй')
-    payload.update({'DataCenterRowId': DataCenterRowId})
+    payload                                                                                     
     # получаем номер и юнит стойки
     url = "{}/api/data-centers/rows/{}/racks?$filter=Name eq '{}'".format(
         auth.api_domain,
@@ -102,15 +111,6 @@ def get_role(auth, name):
         if i.get('Name', 'хуй') == 'Network Roles':
             return [i.get('TextValue').split(',')[0].strip()]
 
-def get_hwmodelid():
-    # по хорошему стоит проверять ноды на складе но пока так
-    return 6119
-
-def get_ip_address():
-    # нужно как-то научиться чекать свободные адреса
-    string = '192.168.0.0'
-    return string
-
 # тут собирается запрос
 def make_payload(auth, line):
     payload = {}
@@ -131,9 +131,34 @@ def make_payload(auth, line):
         print('железка где-то не там:\n\t{} {}'.format(line['asset_tag'],location));payload.clear()
     pprint(payload)
 
+# тут запрос отправляется
+def create(auth, payload, line):
+    url = '{}/api/hosts'.format(auth.api_domain)
+    r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
+    line.update({'status_code': r.status_code})
+    if r.status_code == 200:
+        old_name = json.loads(r.text)[0]['Name']
+        line.update({'old_name': old_name})
+    else:
+        error = json.loads(r.text)['Message']
+        line.update({'error': [error, payload]})
+    return line
+
 def test(auth, reader):
+    reader_2 = []
+    reader_3 = []
     for line in reader:
+        if line[':-)'] == 'TRUE':
+            reader_2.append(line)
+    print(reader_2)
+    for line in reader_2:
         if len(check_host(auth, line['new_name'])) == 0:
-            make_payload(auth, line)
+            reader_3.append(create(auth, make_payload(auth, line), line))
         else:
-            print('{}\tуже есть'.format(line['new_name']))
+            line.update({'error': 'уже есть'})
+            reader_3.append(line)
+    for line in reader_3:
+        if line.get('error', '') == '':
+            print('{}\t{}'.format(line['new_name'],line['old_name']))
+        else:
+            print('{}\t{}'.format(line['new_name'],line['error']))

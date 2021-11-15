@@ -8,14 +8,19 @@ from google.oauth2.credentials import Credentials
 # If modifying these scopes, delete the file temp/token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-spreadsheet_id = '1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w'
+spreadsheet_id = {
+    'temp': sheets.sheets_data['temp'][0],
+    'servers': sheets.sheets_data['servers'][0],
+    'accounting': [sheets.sheets_data['accounting'][0],'Итог смены!I2:O'],
+    'stock': sheets.sheets_data['stock'][0],
+    }
 range_name = ['InfraM!A1:E','InfraM!A1:H']
 
 def infra():
     hh = sheets.mega_auth()
 
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id, range=range_name[0],
+        spreadsheetId=spreadsheet_id['temp'], range=range_name[1],
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
@@ -30,11 +35,11 @@ def infra():
         # pprint(dick)
         return dick
 
-def o_infra():
+def smart(name, num):
     hh = sheets.mega_auth()
 
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id, range=range_name[1],
+        spreadsheetId=spreadsheet_id[name][0], range=spreadsheet_id[name][num],
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
@@ -43,6 +48,7 @@ def o_infra():
         print('No data found.')
     else:   #собираем список словарей (массив хешей)
         dick = []
+        print(values[1:])
         for row in values[1:]:
             string = dict(zip(values[0], row))
             dick.append(string)
@@ -55,7 +61,7 @@ def another():   #собираем словарь эназерпрожектор
     for xx in ['temp!A2:B']:
         request = hh['service'].spreadsheets().values().get(
             # spreadsheetId = sheets.sheets_data['servers'][0],
-            spreadsheetId = '1qCvkrLOWw2rSmMZSEKnN62KPwagyw44hU--wqOwzb-g',
+            spreadsheetId = spreadsheet_id['accounting'][0],
             range = xx,
             valueRenderOption = hh['value_render_option'],
             dateTimeRenderOption = hh['date_time_render_option']).execute()
@@ -66,24 +72,4 @@ def another():   #собираем словарь эназерпрожектор
         dick = {}
         for row in values:
             dick.update({row[0]:row[1]})
-        return dick
-
-def install():
-    hh = sheets.mega_auth()
-    for xx in ['Итог смены!J2:N']:
-        request = hh['service'].spreadsheets().values().get(
-            spreadsheetId = sheets.sheets_data['accounting'][0],
-            range = xx,
-            valueRenderOption = hh['value_render_option'],
-            dateTimeRenderOption = hh['date_time_render_option']).execute()
-    values = request.get('values', [])
-    # print(request)
-    if not values:
-        print('No data found.')
-    else:   #собираем список словарей (массив хешей)
-        dick = []
-        for row in values[1:]:
-            string = dict(zip(values[0], row))
-            dick.append(string)
-        # pprint(dick)
         return dick

@@ -74,8 +74,9 @@ def dict_reader():
         pprint(read.install())                                              if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
-        make.office_switch(auth,read.o_infra())                             if answer ==  'offi' else ''
-        to_plan.test(auth,read.o_infra())                                   if answer ==  'test' else ''
+        make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
+        to_plan.test(auth,read.smart('accounting',1))                                   if answer ==  'test' else ''
+        print(read.smart('accounting',1))                                   if answer == 'print' else ''
 
 def _zip():
     values = read._zip()

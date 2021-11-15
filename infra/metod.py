@@ -70,7 +70,7 @@ def rack_group(row):
 
 def get_location(host, host_type):
     if host_type == 'Network':
-        rack = host.split('-')[-1].upper()
+        rack = host.split('-')[2].upper()
     else:
         rack = host[-6:-2]
     row = rack[:-1]
