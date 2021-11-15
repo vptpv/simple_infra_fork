@@ -76,7 +76,7 @@ def dict_reader():
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
         make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
         to_plan.test(auth,read.smart('accounting',1))                                   if answer ==  'test' else ''
-        print(read.smart('accounting',1))                                   if answer == 'print' else ''
+        print(read.smart('stock','выгрузка!A3:G'))                                   if answer == 'print' else ''
 
 def _zip():
     values = read._zip()

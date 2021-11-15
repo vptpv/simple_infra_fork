@@ -39,7 +39,8 @@ def smart(name, num):
     hh = sheets.mega_auth()
 
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id[name][0], range=spreadsheet_id[name][num],
+        spreadsheetId=spreadsheet_id[name][0],
+        range=spreadsheet_id[name][num] if type(num) is int else num,
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
@@ -47,13 +48,15 @@ def smart(name, num):
     if not values:
         print('No data found.')
     else:   #собираем список словарей (массив хешей)
-        dick = []
-        print(values[1:])
-        for row in values[1:]:
-            string = dict(zip(values[0], row))
-            dick.append(string)
-        # pprint(dick)
-        return dick
+        if type(num) is str:
+            return values[1:]
+        else:
+            dick = []
+            for row in values[1:]:
+                string = dict(zip(values[0], row))
+                dick.append(string)
+            # pprint(dick)
+            return dick
 
 def another():   #собираем словарь эназерпрожекторных тасков
     hh = sheets.mega_auth()

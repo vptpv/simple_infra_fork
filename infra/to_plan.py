@@ -43,8 +43,8 @@ def get_data_from_host(auth, hostname, payload):
     r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
                                                                                     # номер ряда
     DataCenterRowId = json_1[0].get('Id', 'хуй')
-    payload                                                                                     
-    # получаем номер и юнит стойки
+    payload.update({'DataCenterRowId': DataCenterRowId})
+                                                                                    # получаем номер и юнит стойки
     url = "{}/api/data-centers/rows/{}/racks?$filter=Name eq '{}'".format(
         auth.api_domain,
         DataCenterRowId,
@@ -129,7 +129,7 @@ def make_payload(auth, line):
         print('нет имени хоста\n\t{}'.format(line['asset_tag']));payload.clear()
     else:
         print('железка где-то не там:\n\t{} {}'.format(line['asset_tag'],location));payload.clear()
-    pprint(payload)
+    return payload
 
 # тут запрос отправляется
 def create(auth, payload, line):
