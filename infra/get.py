@@ -38,24 +38,36 @@ def sap_4_node(auth):
 
 def zip(auth):
     print('\nначинаю крутить-вертеть\n')
-    select = 'HardwareTypeName,HardwareSubTypeName,HardwareModelName,HardwareModelId,SAPMaterialNumber,InstalledInto,DataCenterLocationName,DataCenterName'
+    select = [
+        'HardwareTypeName,',
+        'HardwareSubTypeName,',
+        'HardwareModelName,',
+        'HardwareModelId,',
+        'SAPMaterialNumber,',
+        'DataCenterLocationName,',
+        'DataCenterName,',
+        'OrgUnitId',
+    ]
+    select_ =''
+    for x in select:
+        select_ = select_ + x
     conditions = [
-        "HostName eq null",
-        " and IsActual eq true",
-        " and IsInTransit eq false",
-        " and IsRepairInProgress eq false",
-        " and InstalledDate eq null",
-        " and InstalledInto eq null"
+        'HostName eq null',
+        ' and HardwareModelId eq 469',
+        ' and IsActual eq true',
+        ' and IsInTransit eq false',
+        ' and IsRepairInProgress eq false',
+        ' and InstalledInto eq null',
     ]
     filter_ =''
     for x in conditions:
         filter_ = filter_ + x
-    url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=HardwareModelName asc"
+    url = f"{auth.api_domain}/api/hardware-items?$select={select_}&$filter={filter_}&$orderby=HardwareModelName asc"
     r = requests.get(url, cookies = auth.cookies)
     json_1 = json.loads(r.text)
     dict_ = {}                  # этап 1 считаем
     for x in json_1:                                    # суммируем уникальные ключи
-        if x.get('InstalledInto') is None:              # которые никуда не установлены
+        if x.get('OrgUnitId') != 198:                   # игнорируем офис
             if dict_.get(json.dumps(x), 0) == 0:        # если ключ уникальный
                 dict_.update([(json.dumps(x),1)])       # добавляем его в хеш со значением один
             else:                                       # иначе
@@ -78,10 +90,10 @@ def zip(auth):
             x.get('DataCenterName')
         ]
         list_2.append(y)
-    print('данные об остатках',end='');    write.stock(list_2);    print(' записаны')
-    print('выпадающий список',end='');     drop_down_list(list_2); print(' обновлён')
-    print('данные о моделях',end='');      hw_models(auth);        print(' выгрузили')
-    print('данные об ОС:\n',end='');       zip_os(auth);           print(' выгрузили')
+    print('данные об остатках',end=''); write.stock(list_2);    print(' записаны')
+    print('выпадающий список',end='');  drop_down_list(list_2); print(' обновлён')
+    print('данные о моделях',end='');   hw_models(auth);        print(' выгрузили')
+    print('данные об ОС:\n',end='');    zip_os(auth);           print(' выгрузили')
     print('\nконец')
 
 def drop_down_list(list_2):

@@ -1,4 +1,4 @@
-import requests, json
+import requests, json, time, sys
 from pprint import pprint
 from infra import metod, kick
 from sheets import write
@@ -67,8 +67,6 @@ def get_data_from_id(auth, asset_tag, payload):
     payload.update({'HardwareModelId': sap_id['HardwareModelId']})
                                                                                     # номер юрика
     payload.update({'BalanceUnitId': int(sap_id['BalanceUnitId'])})
-                                                                                    # где лежит
-    payload.update({'DataCenterLocationId_fuck': sap_id['DataCenterLocationId']})
     if payload.get('TemplateName') == 'Network':
                                                                                     # тип устройства
         payload.update({'NetworkType': sap_id['HardwareSubTypeName']})
@@ -117,19 +115,29 @@ def make_payload(auth, line):
     payload.update({'InstallationTask': line.get('task', '')})
     payload.update({'CustomHostName': line.get('new_name', '')})
     if line['asset_tag'] == '':
-        print('нет метки');exit()
+        line.update({'error': 'нет метки'})
+        return payload,line
     else:
         payload,sap_id = get_data_from_id(auth, line['asset_tag'], payload)
     location = sap_id['DataCenterLocationName']
     if line['new_name'] != '' and location == 'ICVA':
         payload,group = get_data_from_host(auth, line['new_name'], payload)
-        if line.get('unit', '') == '' and payload.get('TemplateName') != 'Network':
-            payload.update({'FirstUnit': metod.position(line['new_name'], group)})
+        try:
+            unit = int(line.get('unit', '').split(' ')[0])
+        except ValueError:
+            line.update({'unit': ''})
+        else:
+            line.update({'unit': unit})
+        if line.get('unit', '') == '' and payload.get('TemplateName') == 'Server':
+            line.update({'unit': metod.position(line['new_name'], group)})
+            payload.update({'FirstUnit': line['unit']})
+        elif type(line['unit']) is int:
+            payload.update({'FirstUnit': line['unit']})
     elif line['new_name'] == '':
-        print('нет имени хоста\n\t{}'.format(line['asset_tag']));payload.clear()
+        line.update({'error': 'нет имени хоста'})
     else:
-        print('железка где-то не там:\n\t{} {}'.format(line['asset_tag'],location));payload.clear()
-    return payload
+        line.update({'error': 'железка где-то не там: {}'.format(location)})
+    return payload,line
 
 # тут запрос отправляется
 def create(auth, payload, line):
@@ -144,21 +152,51 @@ def create(auth, payload, line):
         line.update({'error': [error, payload]})
     return line
 
-def test(auth, reader):
-    reader_2 = []
-    reader_3 = []
-    for line in reader:
+def test(auth, read):
+    reader = {
+        'read': read, # получили при чтении
+        'to work': [], # отфильтрованы только нужные
+        'check': [], # на проверке
+        'error': [], # какие-то ошибки
+        'ok': [], # всё хорошо
+    }
+    for line in reader['read']:
         if line[':-)'] == 'TRUE':
-            reader_2.append(line)
-    print(reader_2)
-    for line in reader_2:
-        if len(check_host(auth, line['new_name'])) == 0:
-            reader_3.append(create(auth, make_payload(auth, line), line))
+            reader['to work'].append(line)
+    # print(reader['to work'])
+    for line in reader['to work']:
+        payload,line = make_payload(auth, line)
+        print(line);pprint(payload)
+        if line.get('error', 0) != 0:
+            reader['error'].append(line)
+        elif len(check_host(auth, line['new_name'])) == 0:
+            print('запрос', end=' ')
+            tic = time.perf_counter()
+            reader['check'].append(create(auth, payload, line))
+            toc = time.perf_counter()
+            print(str(toc-tic), end=' ')
         else:
             line.update({'error': 'уже есть'})
-            reader_3.append(line)
-    for line in reader_3:
-        if line.get('error', '') == '':
-            print('{}\t{}'.format(line['new_name'],line['old_name']))
-        else:
-            print('{}\t{}'.format(line['new_name'],line['error']))
+            reader['error'].append(line)
+    # проверяем ответы сервера
+    print('\nпроверяем ответы')
+    for line in reader['check']:
+        if line.get('error', 0) != 0:
+            reader['error'].append(line)
+            # print('{}\t{}'.format(line['new_name'],line['old_name']))
+        elif line.get('old_name', 0) != 0:
+            reader['ok'].append(line)
+            # print('{}\t{}'.format(line['new_name'],line['error']))
+    pprint(reader['error'])
+    pprint(reader['ok'])
+
+    print('присваиваем метки')
+    kick.set_sap_id(auth, reader['ok'])
+    print('начинаем обратный отсчёт')
+    # for i in range(300,0,-1):
+    #     sys.stdout.write(str(i)+' ')
+    #     sys.stdout.flush()
+    #     time.sleep(1)
+    print('переименовываем серверы')
+    # kick.rename_sap(auth, reader['ok'])
+    kick.rename_hosts(auth, reader['ok'])

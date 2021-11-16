@@ -2,7 +2,7 @@ import json, platform
 import slave_of_lamp, new_fu
 from pprint import pprint
 from sheets import read, write
-from infra import delete, metod, get, kick, make, to_plan
+from infra import delete, metod, get, kick, make, to_plan, variable
 from jira_ import j_read
 
 auth = slave_of_lamp.authentication()
@@ -75,8 +75,9 @@ def dict_reader():
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
         make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
-        to_plan.test(auth,read.smart('accounting',1))                                   if answer ==  'test' else ''
-        print(read.smart('stock','выгрузка!A3:G'))                                   if answer == 'print' else ''
+        to_plan.test(auth,read.smart('accounting',1))                       if answer ==  'test' else ''
+        print(read.smart('stock','выгрузка!A3:G'))                          if answer == 'print' else ''
+        variable.get_zip_2(auth)                                            if answer ==    '_Q' else ''
 
 def _zip():
     values = read._zip()

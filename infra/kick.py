@@ -1,22 +1,35 @@
-import requests, json, datetime
+import requests, json, datetime, time
 from sheets import write
 from pprint import pprint
 
 def rename_hosts(auth, reader):
     for line in reader:
         url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['old_name']}'"
-        r = requests.get(url, cookies = auth.cookies)
-        json_1 = json.loads(r.text)
-        try:
-            hostId = str(json_1[0]["Id"])
-            hostName = str(json_1[0]["HostName"])
-        except IndexError:
-            print(f"{line['old_name']} - не в стойке")
-        else:
+        if line.get('status_code', 0) != 0:
+            json_1 = []
+            tic = time.perf_counter()
+            while len(json_1) == 0:
+                r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+                time.sleep(1)
+            toc = time.perf_counter()
+            print(str(toc-tic))
+
             url = f"{auth.api_domain}/api/hosts/{line['old_name']}/name/{line['new_name']}"
             payload = {"Task": line['task']}
             r = requests.put(url, cookies = auth.cookies, data=json.dumps(payload))
-            print(f"{line['old_name']}\t{line['new_name']}\t{line['task']}")
+            print(r)
+        else:
+            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+            try:
+                hostId = str(json_1[0]["Id"])
+                hostName = str(json_1[0]["HostName"])
+            except IndexError:
+                print(f"{line['old_name']} - не в стойке")
+            else:
+                url = f"{auth.api_domain}/api/hosts/{line['old_name']}/name/{line['new_name']}"
+                payload = {"Task": line['task']}
+                r = requests.put(url, cookies = auth.cookies, data=json.dumps(payload))
+                print(f"{line['old_name']}\t{line['new_name']}\t{line['task']}")
 
 def rename_sap(auth, reader):
     for line in reader:
@@ -38,12 +51,16 @@ def set_sap_id(auth, reader):
     url = f"{auth.api_domain}/api/hosts/accounting/batch-change"
     payload = []
     for line in reader:
-        pair = {
-            "HostName": line['new_name'],
-            # "HostName": line['old_name'],
-            "AccountingId": line['asset_tag']
-            # "WorkTask": line['task']
-        }
+        if line.get('status_code', 0) != 0:
+            pair = {
+                "HostName": line['old_name'],
+                "AccountingId": line['asset_tag']
+            }
+        else:
+            pair = {
+                "HostName": line['new_name'],
+                "AccountingId": line['asset_tag']
+            }
         payload.append(pair)
     r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
     if r.status_code == 200:
@@ -145,18 +162,20 @@ def hard_add_sn(auth, reader): # вроде робит
     pprint(errors)
 
 def change_mac_addresses(auth, reader):
-    hh = {
-        6704: ["edge",150],
-        6: ["mngt_row",240],
-        662: ["mngt_row",250]
-    }
     for line in reader:
         if line['old_name'][2] == ':':
             mac = line['old_name']
         else:
-            mac = f"{line['old_name'][0:2]}:{line['old_name'][2:4]}:{line['old_name'][4:6]}:{line['old_name'][6:8]}:{line['old_name'][8:10]}:{line['old_name'][10:]}"
-        url = f"{auth.api_domain}/api/accountings/{line['asset_tag']}/interfaces"
+            mac = '{}:{}:{}:{}:{}:{}'.format(
+                line['old_name'][0:2],
+                line['old_name'][2:4],
+                line['old_name'][4:6],
+                line['old_name'][6:8],
+                line['old_name'][8:10],
+                line['old_name'][10:],
+                )
 
+        url = f"{auth.api_domain}/api/accountings/{line['asset_tag']}/interfaces"
         payload = [
                 {
                     "Name": "mngt",

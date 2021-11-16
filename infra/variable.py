@@ -1,3 +1,6 @@
+import requests, json
+from pprint import pprint
+
 # возможно, скоро пригодится
 def node_rename(reader):
     for line in reader:
@@ -66,38 +69,59 @@ def set_org_unit_name(cookie, reader):
         print(r.status_code)
 
 # тестовая выгрузка зипа
-def get_zip_2(cookie):
-    select = 'HardwareSubTypeName,HardwareModelName,HardwareModelId,SAPMaterialNumber,InstalledInto,DataCenterLocationName'
-    # select = "ApproximateUseTimeHours,BalanceUnitId,Comment,DataCenterId,DataCenterLocationId,HardwareModelId,HardwareTypeId,HostLinkConfirmed,HostLinkedDateTime,HostName,HostOrgUnitId,InstallationTask,InstalledDate,InstalledInto,InstalledIntoId,IsActual,IsAsset,IsCurrentlyInUse,IsInTransit,IsRepairInProgress,IsUnregistered,OrgUnitId,OrgUnitName,OrgUnitPartnerId,OrgUnitPartnerName,OrgUnitStockId,ParentHasSubject,PartnerId,SAPMaterialNumber"
-    # select = "BalanceUnitId,Comment,DataCenterId,DataCenterLocationId,HardwareModelId,HardwareTypeId,HostLinkConfirmed,HostLinkedDateTime,HostName,HostOrgUnitId,InstalledDate,InstalledInto,InstalledIntoId,IsActual,IsAsset,IsCurrentlyInUse,IsInTransit,IsRepairInProgress,IsUnregistered,OrgUnitId,OrgUnitName,OrgUnitPartnerId,OrgUnitPartnerName,OrgUnitStockId,ParentHasSubject,PartnerId,SAPMaterialNumber"
-    # select = 'AccountedDateTime,ApproximateUseTimeHours,BalanceUnitId,BalanceUnitName,Comment,DataCenterId,DataCenterLocationId,DataCenterLocationName,DataCenterName,DecommissioningDate,DisposalDate,FirstStockDateTime,FirstUnit,HardwareAddressIpmi,HardwareAddresses,HardwareConfigurationId,HardwareConfigurationName,HardwareModelId,HardwareModelName,HardwareOriginalModelId,HardwareOriginalModelName,HardwareSubTypeId,HardwareSubTypeName,HardwareTypeId,HardwareTypeName,HostId,HostLinkConfirmed,HostLinkedDateTime,HostName,HostOrgUnitId,ImeiList,InstallationTask,InstalledDate,InstalledInto,InstalledIntoId,IsActual,IsAsset,IsCurrentlyInUse,IsInTransit,IsRepairInProgress,IsUnregistered,LocationDateTime,OrgUnitId,OrgUnitName,OrgUnitPartnerId,OrgUnitPartnerName,OrgUnitStockId,ParentHasSubject,PartnerId,Rack,RackId,RackRow,RackRowId,RentAllowed,RepairingTask,ReservationTask,ReservedDate,ReservedUser,ReservedUserId,SAPMaterialNumber,SapCommissioningId,SapCommissioningState,SapCommissioningStateId,SapDocumentDate,SapDocumentId,SapHwItemDocumentId,SapPartnerId,SapPartnerName,SerialNumber,SupplyId,Tasks,UnitQuantity,VkNetBoxDeviceId,WorkTask'
-    repair = " and IsRepairInProgress eq false"
-    model = " and HardwareModelId eq 710"
-    location = " and DataCenterLocationName eq 'ICVA'"
-    # location = ""
-    installed = " and InstalledDate eq null and InstalledInto eq null"
-    filter_ = f"$filter=HostName eq null and IsActual eq true and IsInTransit eq false{model}{location}{installed}"
-    # filter_ = f"$filter=HostName eq null and IsInTransit eq false{model}{location}{installed}"
-    url = f"{api_domain}/api/hardware-items?$select={select}&{filter_}"
-    # url = f"{api_domain}/api/hardware-items?$filter={filter_}"
-    print(url)
-    r = requests.get(url, cookies=cookie)
-    json_1 = json.loads(r.text)
-    dict_ = {}
-    for x in json_1:
-        if x.get('InstalledInto') is None:
-            if dict_.get(json.dumps(x), 0) == 0:
-                dict_.update([(json.dumps(x),1)])
-            else:
-                dict_[json.dumps(x)]+=1
-    list_ = []
-    for x in dict_.items():
-        y = json.loads(x[0])
-        y.update([('Quantity',x[1])])
-        # print(str((y)))
-        list_.append(y)
-    q = 0
-    for x in list_:
-        q = q+1
-    pprint(q)
-    pprint(list_)
+def get_zip_2(auth):
+        print('\nначинаю крутить-вертеть\n')
+        select = [
+            'HardwareTypeName,',
+            'HardwareSubTypeName,',
+            'HardwareModelName,',
+            'HardwareModelId,',
+            'SAPMaterialNumber,',
+            'DataCenterLocationName,',
+            'DataCenterName,',
+            'OrgUnitId',
+        ]
+        select_ =''
+        for x in select:
+            select_ = select_ + x
+        conditions = [
+            'HostName eq null',
+            ' and HardwareModelId eq 469',
+            ' and IsActual eq true',
+            ' and IsInTransit eq false',
+            ' and IsRepairInProgress eq false',
+            ' and InstalledInto eq null',
+        ]
+        filter_ =''
+        for x in conditions:
+            filter_ = filter_ + x
+        url = f"{auth.api_domain}/api/hardware-items?$select={select_}&$filter={filter_}&$orderby=HardwareModelName asc"
+        print(url)
+        r = requests.get(url, cookies = auth.cookies)
+        json_1 = json.loads(r.text)
+        dict_ = {}                  # этап 1 считаем
+        for x in json_1:                                    # суммируем уникальные ключи
+            if x.get('OrgUnitId') != 198:                   # игнорируем офис
+                if dict_.get(json.dumps(x), 0) == 0:        # если ключ уникальный
+                    dict_.update([(json.dumps(x),1)])       # добавляем его в хеш со значением один
+                else:                                       # иначе
+                    dict_[json.dumps(x)]+=1                 # увеличиваем значение ключа на еденицу
+        list_ = []                  # этап 2 собираем
+        for x in dict_.items():                             # перебераем получившиеся пары
+            y = json.loads(x[0])                            # парсим хеш ключа
+            y.update([('Quantity',x[1])])                   # и дописываем в него количество
+            list_.append(y)                                 # получившееся дописываем в массив
+        list_2 = []                 # этап 3 генерим данные для записи в таблицу
+        for x in list_:
+            sapMaterial = f"000{x.get('SAPMaterialNumber')}"
+            sapMaterial = sapMaterial[-4:]
+            y = [
+                sapMaterial,str(x.get('HardwareModelId')),
+                f"{x.get('HardwareTypeName')} {x.get('HardwareSubTypeName')}",
+                x.get('HardwareModelName'),
+                x.get('Quantity'),
+                x.get('DataCenterLocationName'),
+                x.get('DataCenterName')
+            ]
+            list_2.append(y)
+        pprint(list_2)

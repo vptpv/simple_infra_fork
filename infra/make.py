@@ -7,7 +7,7 @@ def to_plan_node(auth, reader):
     list_ = []
     for line in reader:
         string_ = {
-            'old_name': metod.get_fat_name(auth.cookies, auth.api_domain, line['new_name']),
+            'old_name': metod.get_fat_name(auth, line['new_name']),
             'new_name': line['new_name'],
             'asset_tag': line['asset_tag'],
             'serial': line['serial'],
@@ -16,7 +16,7 @@ def to_plan_node(auth, reader):
         list_.append(string_)
     # write.temp(list_)
     pprint(list_)
-    make.node_hosts(auth.cookies, list_)
+    node_hosts(auth, list_)
     # write.node_hosts(cookies, auth.api_domain, auth.headers, host)
 
 def switch(auth, reader):
