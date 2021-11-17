@@ -53,7 +53,6 @@ def zip(auth):
         select_ = select_ + x
     conditions = [
         'HostName eq null',
-        ' and HardwareModelId eq 469',
         ' and IsActual eq true',
         ' and IsInTransit eq false',
         ' and IsRepairInProgress eq false',
