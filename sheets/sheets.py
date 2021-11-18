@@ -9,7 +9,7 @@ from google.oauth2.credentials import Credentials
 # If modifying these scopes, delete the file temp/token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 # The ID and range of a sample spreadsheet.
-sheets_data = {
+data = {
     'stickers_data':[ # наклейки
         '1LmR2SUtVsw6DnqiQZ9LxWNlIJ7DJs2OKjNCssJo4Sms',
         ['Лист1!A1:E']

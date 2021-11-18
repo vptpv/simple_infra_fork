@@ -69,11 +69,13 @@ def dict_reader():
         kick.hard_add_sn(auth, read.infra())                                if answer == 'жоско' else ''
         print(metod.get_fat_name(str(input('\nимя ноды: ').strip())))       if answer ==   'get' else ''
         # _zip()                                                              if answer ==  '_zip' else ''
-        pprint(read.install())                                              if answer ==  'read' else ''
+        pprint(read.smart('accounting',1))                                  if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
         make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
-        print(read.smart('stock','выгрузка!A3:G'))                          if answer == 'print' else ''
+        # print(read.infra())    if answer == 'print' else ''
+        print(read.infra());pprint(read.smart('WORK HARD','Лист123!A1:D'))    if answer == 'print' else ''
+        # print(read.smart('WORK HARD','InfraM!A1:E'))                          if answer == 'print' else ''
         variable.get_zip_2(auth)                                            if answer ==    '_Q' else ''
 
 def _zip():

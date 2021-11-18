@@ -9,10 +9,11 @@ from google.oauth2.credentials import Credentials
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 spreadsheet_id = {
-    'temp': sheets.sheets_data['temp'][0],
-    'servers': sheets.sheets_data['servers'][0],
-    'accounting': [sheets.sheets_data['accounting'][0],'Итог смены!I2:O'],
-    'stock': sheets.sheets_data['stock'][0],
+    'temp': [sheets.data['temp'][0]],
+    'servers': [sheets.data['servers'][0]],
+    'accounting': [sheets.data['accounting'][0],'Итог смены!I2:O'],
+    'stock': [sheets.data['stock'][0]],
+    'WORK HARD': ['1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w'],
     }
 range_name = ['InfraM!A1:E','InfraM!A1:H']
 
@@ -20,7 +21,7 @@ def infra():
     hh = sheets.mega_auth()
 
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id['temp'], range=range_name[1],
+        spreadsheetId=spreadsheet_id['temp'][0], range=range_name[1],
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
@@ -37,10 +38,9 @@ def infra():
 
 def smart(name, num):
     hh = sheets.mega_auth()
-
+    my_range = spreadsheet_id[name][num] if type(num) is int else num
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id[name][0],
-        range=spreadsheet_id[name][num] if type(num) is int else num,
+        spreadsheetId=spreadsheet_id[name][0], range=spreadsheet_id[name][num] if type(num) is int else num,
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
@@ -64,7 +64,7 @@ def another():   #собираем словарь эназерпрожектор
     # for xx in ['another!A2:B']:
     for xx in ['temp!A2:B']:
         request = hh['service'].spreadsheets().values().get(
-            # spreadsheetId = sheets.sheets_data['servers'][0],
+            # spreadsheetId = sheets.data['servers'][0],
             spreadsheetId = spreadsheet_id['accounting'][0],
             range = xx,
             valueRenderOption = hh['value_render_option'],
