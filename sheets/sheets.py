@@ -12,31 +12,52 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 data = {
     'stickers_data':[ # наклейки
         '1LmR2SUtVsw6DnqiQZ9LxWNlIJ7DJs2OKjNCssJo4Sms',
-        ['Лист1!A1:E']
+        {
+            0: ['Лист1!A1:E'],
+            }
     ],
     'stock':[ # запасные комплектующие
         '1wbn-NkP5Q2XDyhG7nNODZCia_kNXOOvmOb4evBLHvao',
-        ['выгрузка!I3:L','выгрузка!A1','выгрузка!A3:G','']
-        # 0               1             2               3
+        {
+            0: 'выгрузка!I3:L',
+            1: 'выгрузка!A1',
+            2: 'выгрузка!A3:G',
+            3: '',
+            }
     ],
     'servers':[ # файл с серверами
         '1LCzfHK38xDHcA6L0UYn0FzsR0LQ0cN5fVhCtOOFRX8U',
-        ['from_cmdb!A2:K','Hot!M2:W','Hot!A2:K','another!E2:J']
-        # 0                1          2          3
+        {
+            0: 'from_cmdb!A2:K',
+            1: 'Hot!M2:W',
+            2: 'Hot!A2:K',
+            3: 'another!E2:J',
+            }
 
     ],
     'temp':[ # work hard
         '1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w',
-        ['temp!A2:C']
+        {
+            0: ['temp!A2:C'],
+            1: 'InfraM!A1:E',
+            }
     ],
     'accounting':[ # учёт комплектующих
         '1qCvkrLOWw2rSmMZSEKnN62KPwagyw44hU--wqOwzb-g',
-        [['materials!A3:D'],['materials!P3:Q'],'materials!S3:T']
-        # 0                  1                 2
+        {
+            0: ['materials!A3:D'],
+            1: ['materials!P3:Q'],
+            2: 'materials!S3:T',
+            3: 'Итог смены!I2:O',
+            4: 'temp!A2:B',
+            }
     ],
     'hw_models':[ # 
         '1ijPWH99k6B1mVCZ5WzuEFFPhQFrYh5UNXYOovk-Sj4Y',
-        ['Лист1!A2:E','Лист4!A2:G']
+        {
+            0: 'Лист1!A2:E',
+            1: 'Лист4!A2:G',
+            }
     ],
 }
 

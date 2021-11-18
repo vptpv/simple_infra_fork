@@ -63,19 +63,21 @@ def dict_reader():
         delete.hosts_by_name(auth, read.infra())                            if answer ==    '11' else ''
         kick.rename_hosts(auth, read.infra())                               if answer ==     '2' else ''
         kick.rename_sap(auth, read.infra())                                 if answer ==   '202' else ''
-        to_plan.test(auth,read.smart('accounting',1))                       if answer ==  'make' else ''
-        make.to_plan_node(auth,read.smart('accounting',1))                  if answer == '0make' else ''
+        to_plan.test(auth,read.smart('accounting',3))                       if answer ==  'make' else ''
+        make.to_plan_node(auth,read.smart('accounting',3))                  if answer == '0make' else ''
         kick.set_sap_id(auth, read.infra())                                 if answer ==    '22' else ''
         kick.hard_add_sn(auth, read.infra())                                if answer == 'жоско' else ''
         print(metod.get_fat_name(str(input('\nимя ноды: ').strip())))       if answer ==   'get' else ''
         # _zip()                                                              if answer ==  '_zip' else ''
-        pprint(read.smart('accounting',1))                                  if answer ==  'read' else ''
+        pprint(read.smart('accounting',3))                                  if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
         make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
-        # print(read.infra())    if answer == 'print' else ''
-        print(read.infra());pprint(read.smart('WORK HARD','Лист123!A1:D'))    if answer == 'print' else ''
-        # print(read.smart('WORK HARD','InfraM!A1:E'))                          if answer == 'print' else ''
+        if answer == 'print':
+            print(read.another())
+            print(read.smart('temp','коммутаторы на продажу!A3:G10'))
+            print(read.infra())
+            print(read.smart('servers','Hot!A1:B'))
         variable.get_zip_2(auth)                                            if answer ==    '_Q' else ''
 
 def _zip():

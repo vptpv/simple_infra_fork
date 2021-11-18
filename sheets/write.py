@@ -126,35 +126,3 @@ def another(values): # выгружает эназерпрожекторные �
         request = hh['service'].spreadsheets().values().update(
             spreadsheetId=data[xx]['id'], range=data[xx]['range'],
             valueInputOption=hh['value_input_option'][0], body=data[xx]['body']).execute()
-
-# def _zip(values): # фиксирует расход (не работает)
-#     hh = sheets.mega_auth()
-#     ranges = {
-#         'выгрузка!AJ3:AO':['выгрузка!AJ3:AM','выгрузка!AN3:AO'],
-#         'выгрузка!H3:M':['выгрузка!H3:K','выгрузка!L3:M'],
-#         }
-#     body = {
-#         'values': [[datetime.datetime.today().strftime("%d.%m.%Y")]]
-#     }
-#     request = hh['service'].spreadsheets().values().update(
-#         spreadsheetId = sheets.data['stock'][0], range = 'выгрузка!AJ2',
-#         valueInputOption = hh['value_input_option'][0], body = body).execute()
-#     for xx in ranges.keys():
-#         index = 0
-#         request = hh['service'].spreadsheets().values().clear(
-#             spreadsheetId = sheets.data['stock'][0],
-#             range = xx,
-#             body = hh['clear_values_request_body']).execute()
-#         print(f"{xx} стёрто")
-#         for value_part in values:
-#             body = {
-#                 'values': value_part
-#             }
-#             # for xx in [ranges[xx][index]]:
-#             request = hh['service'].spreadsheets().values().update(
-#                 spreadsheetId = sheets.data['stock'][0],
-#                 range = ranges[xx][index],
-#                 valueInputOption = hh['value_input_option'][index],
-#                 body = body).execute()
-#             print(f"{ranges[xx][index]} записано")
-#             index+=1

@@ -5,23 +5,11 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
-# If modifying these scopes, delete the file temp/token.json.
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-
-spreadsheet_id = {
-    'temp': [sheets.data['temp'][0]],
-    'servers': [sheets.data['servers'][0]],
-    'accounting': [sheets.data['accounting'][0],'Итог смены!I2:O'],
-    'stock': [sheets.data['stock'][0]],
-    'WORK HARD': ['1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w'],
-    }
-range_name = ['InfraM!A1:E','InfraM!A1:H']
-
 def infra():
     hh = sheets.mega_auth()
 
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id['temp'][0], range=range_name[1],
+        spreadsheetId=sheets.data['temp'][0], range=sheets.data['temp'][1][1],
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
@@ -38,9 +26,10 @@ def infra():
 
 def smart(name, num):
     hh = sheets.mega_auth()
-    my_range = spreadsheet_id[name][num] if type(num) is int else num
+    """если номер, то берём диапазон из списка"""
+    range_ = sheets.data[name][1][num] if type(num) is int else num
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id[name][0], range=spreadsheet_id[name][num] if type(num) is int else num,
+        spreadsheetId=sheets.data[name][0], range=range_,
         valueRenderOption=hh['value_render_option'],
         dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
@@ -56,19 +45,18 @@ def smart(name, num):
                 string = dict(zip(values[0], row))
                 if string.get(':-)', '') == 'TRUE' or string.get(':-(', '') == 'TRUE':
                     dick.append(string)
+                elif string.get(':-)', '') == '' and string.get(':-(', '') == '':
+                    dick.append(row)
             # pprint(dick)
             return dick
 
 def another():   #собираем словарь эназерпрожекторных тасков
     hh = sheets.mega_auth()
-    # for xx in ['another!A2:B']:
-    for xx in ['temp!A2:B']:
-        request = hh['service'].spreadsheets().values().get(
-            # spreadsheetId = sheets.data['servers'][0],
-            spreadsheetId = spreadsheet_id['accounting'][0],
-            range = xx,
-            valueRenderOption = hh['value_render_option'],
-            dateTimeRenderOption = hh['date_time_render_option']).execute()
+    request = hh['service'].spreadsheets().values().get(
+        spreadsheetId = sheets.data['accounting'][0],
+        range = sheets.data['accounting'][1][4],
+        valueRenderOption = hh['value_render_option'],
+        dateTimeRenderOption = hh['date_time_render_option']).execute()
     values = request.get('values', [])
     if not values:
         print('No data found.')
