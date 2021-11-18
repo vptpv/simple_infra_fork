@@ -6,11 +6,12 @@ def rename_hosts(auth, reader):
     for line in reader:
         url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['old_name']}'"
         if line.get('status_code', 0) != 0:
+            """если есть статус, значит работал скрипт и нужно ждать пока хост появится"""
             json_1 = []
             tic = time.perf_counter()
             while len(json_1) == 0:
                 r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
-                time.sleep(1)
+                time.sleep(5)
             toc = time.perf_counter()
             print(str(toc-tic))
 
@@ -52,6 +53,7 @@ def set_sap_id(auth, reader):
     payload = []
     for line in reader:
         if line.get('status_code', 0) != 0:
+            """если есть статус, значит работал скрипт и нужное имя в другом ключе"""
             pair = {
                 "HostName": line['old_name'],
                 "AccountingId": line['asset_tag']
@@ -183,6 +185,7 @@ def change_mac_addresses(auth, reader):
                 }
             ]
         r = requests.put(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
+        print(f"{r.status_code}\t'{json.loads(r.text)['Message']}'")
         # r = requests.delete(url, cookies = auth.cookies, headers = auth.headers)
         if r.status_code != 200:
             print('')

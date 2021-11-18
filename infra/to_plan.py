@@ -145,8 +145,17 @@ def create(auth, payload, line):
     r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
     line.update({'status_code': r.status_code})
     if r.status_code == 200:
-        old_name = json.loads(r.text)[0]['Name']
-        line.update({'old_name': old_name})
+        if payload.get('BladeSlotList', 0) != 0:
+            """если нода, записываем имя и статус в каждый хост"""
+            message = json.loads(r.text)
+            i = 0
+            for each in message:
+                line['nodes'][i].update({'old_name': each['Name']})
+                line['nodes'][i].update({'status_code': r.status_code})
+                i += 1
+        else:
+            old_name = json.loads(r.text)[0]['Name']
+            line.update({'old_name': old_name})
     else:
         error = json.loads(r.text)['Message']
         line.update({'error': [error, payload]})
@@ -192,7 +201,7 @@ def test(auth, read):
 
     print('присваиваем метки')
     kick.set_sap_id(auth, reader['ok'])
-    print('начинаем обратный отсчёт')
+    # print('начинаем обратный отсчёт')
     # for i in range(300,0,-1):
     #     sys.stdout.write(str(i)+' ')
     #     sys.stdout.flush()

@@ -1,22 +1,16 @@
 import requests, json
 
-def get_fat_name(auth, host):
+def get_fat_name(host):
     host = hostname(host)
-    rackname = f" and DataCenterRackName eq '{host[-6:-2]}'"
-    select = 'DataCenterLocation,DataCenterName'
-    filter_ = f"DataCenterRackName eq '{host[-6:-2]}'"
-    url = f"{auth.api_domain}/api/hosts?$top=1&$select={select}&$filter={filter_}"
-    r = requests.get(url, cookies=auth.cookies)
-    json_1 = json.loads(r.text)
-    for x in json_1:
-        if x.get('DataCenterLocation') is not None:
-            string = fat_name(host, x.get('DataCenterName'))
-            return string
-
-def fat_name(host, rack_group):
-    bzh = '000'+str(int(host[-3:])+first_unit(host, rack_group))
-    hostname = f"FT{host[-6:-3]}{bzh[-3:]}"
-    return hostname
+    r_group = rack_group(host[-6:-3])
+    if r_group[:4].lower() == 'icva':
+        poz = position(host, r_group)
+        per = float(host[-2:])/4
+        bzh = '000'+str(poz-int((per-int(per))/0.25))
+        return f"FT{host[-6:-2]}{bzh[-2:]}"
+    else:
+        # bzh = '000'+str(int(int(host[-2:])/4)+first_unit(host, rack_group))
+        return 'fatname'
 
 def hostname(host): # добавляет префикс хосту
     if len(host) > 5:

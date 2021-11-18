@@ -29,7 +29,7 @@ option = [
         '   11. удалить хосты по именам',
         '    2. переименовать хосты по именам',
         '  202. переименовать хосты по меткам',
-        ' make. спланировать хосты switch()',
+        ' make. спланировать хосты !!!может работать не корректно!!!',
         '0make. спланировать ноды в пустые шасси to_plan_node(reader)',
         '   22. присвоить метки set_sap_id(reader)',
         'жоско. добавить серийник жоско',
@@ -63,19 +63,16 @@ def dict_reader():
         delete.hosts_by_name(auth, read.infra())                            if answer ==    '11' else ''
         kick.rename_hosts(auth, read.infra())                               if answer ==     '2' else ''
         kick.rename_sap(auth, read.infra())                                 if answer ==   '202' else ''
-        make.switch(auth,read.infra())                                      if answer ==  'make' else ''
-        make.terminal(auth,read.infra())                                    if answer == 'make2' else ''
-        make.dwdm(auth,read.infra())                                        if answer == 'make3' else ''
-        make.to_plan_node(auth, read.infra())                               if answer == '0make' else ''
+        to_plan.test(auth,read.smart('accounting',1))                       if answer ==  'make' else ''
+        make.to_plan_node(auth,read.smart('accounting',1))                  if answer == '0make' else ''
         kick.set_sap_id(auth, read.infra())                                 if answer ==    '22' else ''
         kick.hard_add_sn(auth, read.infra())                                if answer == 'жоско' else ''
-        print(metod.get_fat_name(auth, str(input('\nимя ноды: ').strip()))) if answer ==   'get' else ''
+        print(metod.get_fat_name(str(input('\nимя ноды: ').strip())))       if answer ==   'get' else ''
         # _zip()                                                              if answer ==  '_zip' else ''
         pprint(read.install())                                              if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
         make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
-        to_plan.test(auth,read.smart('accounting',1))                       if answer ==  'test' else ''
         print(read.smart('stock','выгрузка!A3:G'))                          if answer == 'print' else ''
         variable.get_zip_2(auth)                                            if answer ==    '_Q' else ''
 

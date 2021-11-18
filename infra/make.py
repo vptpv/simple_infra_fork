@@ -1,23 +1,85 @@
 import requests, json
 from pprint import pprint
-from infra import metod, kick
+from infra import metod, kick, to_plan
 from sheets import write
 
-def to_plan_node(auth, reader):
+def get_parent_for_nodes(auth, reader):
     list_ = []
     for line in reader:
-        string_ = {
-            'old_name': metod.get_fat_name(auth, line['new_name']),
-            'new_name': line['new_name'],
-            'asset_tag': line['asset_tag'],
-            'serial': line['serial'],
-            'task': line['task']
-        }
-        list_.append(string_)
-    # write.temp(list_)
-    pprint(list_)
-    node_hosts(auth, list_)
-    # write.node_hosts(cookies, auth.api_domain, auth.headers, host)
+        line.update({'fat_name': metod.get_fat_name(line['new_name'])})
+        line,sap_id = to_plan.get_data_from_id(auth, line['asset_tag'], line)
+        line,group = to_plan.get_data_from_host(auth, line['new_name'], line)
+        list_.append(line)
+    hh = {}
+    for line in list_:
+        if hh.get(line['fat_name'], 0) == 0:
+            hh.update({line['fat_name']: {}})
+            hh[line['fat_name']].update({'nodes':[line]})
+            FreeSlots,ParentHostId = check_blade(auth, line)
+            hh[line['fat_name']].update({
+                'payload':{
+                    'TemplateName': line['TemplateName'],
+                    'OrgUnitId': line['OrgUnitId'],
+                    'DataCenterId': line['DataCenterId'],
+                    'InstallationTask': line['task'],
+                    'HardwareModelId': line['HardwareModelId'],
+                    'ParentHostId': ParentHostId,
+                    'BladeSlotList': FreeSlots,
+                },
+                })
+        else:
+            hh[line['fat_name']]['nodes'].append(line)
+    for key in hh.keys():
+        """занимаем только нужное количество слотов"""
+        row = len(hh[key]['nodes'])
+        empty = len(hh[key]['payload']['BladeSlotList'])
+        arr = hh[key]['payload']['BladeSlotList']
+        while empty > row:
+            empty = empty - 1;arr.pop()
+    return hh
+
+def check_blade(auth, line):
+    url = '{}/api/templates/host-blades?orgUnitId={}&dataCenterId={}&freeSlots=True&$filter=Name eq \'{}\''.format(
+        auth.api_domain,
+        line['OrgUnitId'],
+        line['DataCenterId'],
+        line['fat_name'],
+        )
+    r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)[0]
+    return json_1['FreeSlots'],json_1['Id']
+
+def to_plan_node(auth, read):
+    reader = {
+        'read': read, # получили при чтении
+        'to work': [], # отфильтрованы только нужные
+        'check': [], # на проверке
+        'error': [], # какие-то ошибки
+        'ok': [], # всё хорошо
+    }
+    for line in reader['read']:
+        if line[':-)'] == 'TRUE':
+            reader['to work'].append(line)
+    hh = get_parent_for_nodes(auth, reader['to work'])
+    for key in hh.keys():
+        len_ = 0
+        for line in hh[key]['nodes']:
+            len_ = len_ + int(len(to_plan.check_host(auth, line['new_name'])))
+        if len_ == 0:
+            pprint('{} и {} хост(а) пошли'.format(
+                key,
+                len(hh[key]['nodes']),
+                ))
+            hh[key] = to_plan.create(auth, hh[key]['payload'], hh[key])
+        else:
+            line.update({'error': 'дубликат хоста'})
+    print('присваиваем метки')
+    for key in hh.keys():
+        kick.set_sap_id(auth, hh[key]['nodes'])
+
+    print('переименовываем серверы')
+    for key in hh.keys():
+        kick.rename_hosts(auth, hh[key]['nodes'])
+    pprint(hh)
 
 def switch(auth, reader):
     array = []
@@ -142,44 +204,6 @@ def terminal(auth, reader):
                     'task': "что-то не так"
                 }
                 array.append(string_2)
-    pprint(array)
-    # rename_hosts(array)
-
-def node_hosts(auth, reader):
-    array = []
-    for line in reader:
-        # print("бжж")
-        url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['old_name']}'"
-        r = requests.get(url, cookies = auth.cookies)
-        json_1 = json.loads(r.text)
-        try:
-            ParentHostId = json_1[0]["Id"]
-            DataCenterId = json_1[0]["DataCenterId"]
-            OrgUnitId = json_1[0]["OrgUnitId"]
-            # hostName = str(json_1[0]["HostName"])
-        except IndexError:
-            print(f"{line['old_name']} - не в стойке")
-        else:
-            url = f"{auth.api_domain}/api/hosts"
-            payload = {
-            # "Task": line['task']
-                "TemplateName": "Server",# - имя шаблона (тип хоста), обязательное поле
-                "OrgUnitId": OrgUnitId,# - для какого проекта создается хост (здесь и ниже используется уникальный идентификатор оргюнита в системе CMDB), обязательное поле
-                "HardwareModelId": 6119,# - уникальный идентификатор модели в системе CMDB, обязательное поле,
-                "InstallationTask": line['task'],# - задача, по которой устанавливается оборудование, обязательное поле
-                "DataCenterId": DataCenterId,# - идентификатор датацентра в системе CMDB, обязательное поле
-                "ParentHostId": ParentHostId,# - идентификатор blade-свича, обязательное поле для blade-сервера
-                "BladeSlotList": [1,2,3,4],# - идентификаторы слотов blade-свича, обязательное поле для blade-сервера
-                }
-            r = requests.post(url, cookies = auth.cookies, data=json.dumps(payload), headers = auth.headers)
-            if r.status_code == 200:
-                for x in [1,2,3,4]:
-                    string_2 = {
-                        'old_name': f"icva{line['old_name'][-6:]}0{x}",
-                        'new_name': f"{line['new_name'][:-3]}{str(int(line['new_name'][-3:])+x-1)}",
-                        'task': line['task']
-                    }
-                    array.append(string_2)
     pprint(array)
     # rename_hosts(array)
 
