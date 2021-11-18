@@ -54,7 +54,8 @@ def smart(name, num):
             dick = []
             for row in values[1:]:
                 string = dict(zip(values[0], row))
-                dick.append(string)
+                if string.get(':-)', '') == 'TRUE' or string.get(':-(', '') == 'TRUE':
+                    dick.append(string)
             # pprint(dick)
             return dick
 

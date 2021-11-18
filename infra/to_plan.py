@@ -163,15 +163,11 @@ def create(auth, payload, line):
 
 def test(auth, read):
     reader = {
-        'read': read, # получили при чтении
-        'to work': [], # отфильтрованы только нужные
+        'to work': read, # отфильтрованы только нужные
         'check': [], # на проверке
         'error': [], # какие-то ошибки
         'ok': [], # всё хорошо
     }
-    for line in reader['read']:
-        if line[':-)'] == 'TRUE':
-            reader['to work'].append(line)
     # print(reader['to work'])
     for line in reader['to work']:
         payload,line = make_payload(auth, line)
