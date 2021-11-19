@@ -53,8 +53,8 @@ def smart(name, num):
 def another():   #собираем словарь эназерпрожекторных тасков
     hh = sheets.mega_auth()
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId = sheets.data['accounting'][0],
-        range = sheets.data['accounting'][1][4],
+        spreadsheetId = sheets.data['servers'][0],
+        range = sheets.data['servers'][1][4],
         valueRenderOption = hh['value_render_option'],
         dateTimeRenderOption = hh['date_time_render_option']).execute()
     values = request.get('values', [])

@@ -75,9 +75,11 @@ def dict_reader():
         make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
         if answer == 'print':
             print(read.another())
-            print(read.smart('temp','коммутаторы на продажу!A3:G10'))
-            print(read.infra())
-            print(read.smart('servers','Hot!A1:B'))
+            # print(read.smart('temp','коммутаторы на продажу!A3:G10'))
+            # print(read.infra())
+            # print(read.smart('servers','Hot!A1:B'))
+            # print(read.smart('test','servers!e2:E'))
+            # print(read.smart('servers','another project!a2:E'))
         variable.get_zip_2(auth)                                            if answer ==    '_Q' else ''
 
 def _zip():

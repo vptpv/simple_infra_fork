@@ -28,10 +28,11 @@ data = {
     'servers':[ # файл с серверами
         '1LCzfHK38xDHcA6L0UYn0FzsR0LQ0cN5fVhCtOOFRX8U',
         {
-            0: 'from_cmdb!A2:K',
-            1: 'Hot!M2:W',
-            2: 'Hot!A2:K',
-            3: 'another!E2:J',
+            0: 'from_cmdb!A3:K', # сюда пишет всё по осам
+            1: 'hot zip!A3:K', # сюда пишет горячий зип
+            2: 'on 5 floor!A3:K', # сюда пишет сервера на складе
+            3: 'another project!A3:F', # сюда пишет эназерпрожектные осы
+            4: 'another project!G3:H', # отсюда берёт соотношение таска к проекту
             }
 
     ],
@@ -49,13 +50,19 @@ data = {
             1: ['materials!P3:Q'],
             2: 'materials!S3:T',
             3: 'Итог смены!I2:O',
-            4: 'temp!A2:B',
             }
     ],
     'hw_models':[ # 
         '1ijPWH99k6B1mVCZ5WzuEFFPhQFrYh5UNXYOovk-Sj4Y',
         {
             0: 'Лист1!A2:E',
+            1: 'Лист4!A2:G',
+            }
+    ],
+    'test':[ # 
+        '1vzjAqnVwXvZKIicurcvZNcoiQTScEOLF7sF4_ClvHis',
+        {
+            0: 'servers!A2:E',
             1: 'Лист4!A2:G',
             }
     ],
