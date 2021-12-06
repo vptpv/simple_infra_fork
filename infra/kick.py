@@ -4,33 +4,36 @@ from pprint import pprint
 
 def rename_hosts(auth, reader):
     for line in reader:
-        url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['old_name']}'"
-        if line.get('status_code', 0) != 0:
-            """если есть статус, значит работал скрипт и нужно ждать пока хост появится"""
-            json_1 = []
-            tic = time.perf_counter()
-            while len(json_1) == 0:
-                r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
-                time.sleep(5)
-            toc = time.perf_counter()
-            print(str(toc-tic))
-
-            url = f"{auth.api_domain}/api/hosts/{line['old_name']}/name/{line['new_name']}"
-            payload = {"Task": line['task']}
-            r = requests.put(url, cookies = auth.cookies, data=json.dumps(payload))
-            print(r)
+        if line['old_name'] == line['new_name']:
+            print(line['new_name'], end='\t')
         else:
-            r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
-            try:
-                hostId = str(json_1[0]["Id"])
-                hostName = str(json_1[0]["HostName"])
-            except IndexError:
-                print(f"{line['old_name']} - не в стойке")
-            else:
+            url = f"{auth.api_domain}/api/hosts?$filter=HostName eq '{line['old_name']}'"
+            if line.get('status_code', 0) != 0:
+                """если есть статус, значит работал скрипт и нужно ждать пока хост появится"""
+                json_1 = []
+                tic = time.perf_counter()
+                while len(json_1) == 0:
+                    r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+                    time.sleep(5)
+                toc = time.perf_counter()
+                print('&.2f' & toc-tic)
+
                 url = f"{auth.api_domain}/api/hosts/{line['old_name']}/name/{line['new_name']}"
                 payload = {"Task": line['task']}
                 r = requests.put(url, cookies = auth.cookies, data=json.dumps(payload))
-                print(f"{line['old_name']}\t{line['new_name']}\t{line['task']}")
+                print(r)
+            else:
+                r = requests.get(url, cookies = auth.cookies);json_1 = json.loads(r.text)
+                try:
+                    hostId = str(json_1[0]["Id"])
+                    hostName = str(json_1[0]["HostName"])
+                except IndexError:
+                    print(f"{line['old_name']} - не в стойке")
+                else:
+                    url = f"{auth.api_domain}/api/hosts/{line['old_name']}/name/{line['new_name']}"
+                    payload = {"Task": line['task']}
+                    r = requests.put(url, cookies = auth.cookies, data=json.dumps(payload))
+                    print(f"{line['old_name']}\t{line['new_name']}\t{line['task']}")
 
 def rename_sap(auth, reader):
     for line in reader:

@@ -1,15 +1,22 @@
 import requests, json, time, sys
 from pprint import pprint
 from infra import metod, kick
-from sheets import write
+from sheets import read, write
 
 def get_hwmodelid():
     # по хорошему стоит проверять ноды на складе но пока так
     return 6119
 
-def get_ip_address():
-    # нужно как-то научиться чекать свободные адреса
-    string = '192.168.0.0'
+def get_ip_address(CustomHostName):
+    # чекаем список адресов от админа на листе temp
+    arr = read.smart('accounting',4)
+    if len(arr) > 0:
+        hh = {}
+        for line in arr:
+            hh.update({line[0].lower():line[1]})
+        string = hh.get(CustomHostName.lower(),'0.0.0.0')
+    else:
+        string = '0.0.0.0'
     return string
 
 def get_data_from_host(auth, hostname, payload):
@@ -71,7 +78,7 @@ def get_data_from_id(auth, asset_tag, payload):
                                                                                     # тип устройства
         payload.update({'NetworkType': sap_id['HardwareSubTypeName']})
                                                                                     # ip address
-        payload.update({'Ip':get_ip_address()})
+        payload.update({'Ip':get_ip_address(payload.get('CustomHostName'))})
         if payload.get('NetworkType') == 'Switch':
                                                                                     # роль свича
             payload.update({'NetworkRoles': get_role(auth, sap_id['HardwareModelName'])})
@@ -179,7 +186,7 @@ def test(auth, read):
             tic = time.perf_counter()
             reader['check'].append(create(auth, payload, line))
             toc = time.perf_counter()
-            print(str(toc-tic), end=' ')
+            print('&.2f' & toc-tic)
         else:
             line.update({'error': 'уже есть'})
             reader['error'].append(line)
@@ -193,9 +200,9 @@ def test(auth, read):
             reader['ok'].append(line)
             # print('{}\t{}'.format(line['new_name'],line['error']))
     pprint(reader['error'])
-    pprint(reader['ok'])
+    # pprint(reader['ok'])
 
-    print('присваиваем метки')
+    print('\tприсваиваем метки')
     kick.set_sap_id(auth, reader['ok'])
     # print('начинаем обратный отсчёт')
     # for i in range(300,0,-1):

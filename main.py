@@ -74,12 +74,13 @@ def dict_reader():
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
         make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
         if answer == 'print':
-            print(read.another())
+            print(to_plan.get_ip_address('IPMI-E-6060'))
+            # print(to_plan.get_ip_address('IPMI-E-6064'))
+            # print(read.another())
             # print(read.smart('temp','коммутаторы на продажу!A3:G10'))
-            # print(read.infra())
             # print(read.smart('servers','Hot!A1:B'))
             # print(read.smart('test','servers!e2:E'))
-            # print(read.smart('servers','another project!a2:E'))
+            # print(read.smart('accounting','temp!a2:b'))
         variable.get_zip_2(auth)                                            if answer ==    '_Q' else ''
 
 def _zip():

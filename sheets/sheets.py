@@ -50,6 +50,7 @@ data = {
             1: ['materials!P3:Q'],
             2: 'materials!S3:T',
             3: 'Итог смены!I2:O',
+            4: 'temp!a1:b',
             }
     ],
     'hw_models':[ # 

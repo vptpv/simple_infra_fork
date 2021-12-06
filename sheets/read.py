@@ -36,7 +36,7 @@ def smart(name, num):
     # print(request)
     if not values:
         print('No data found.')
-    else:   #собираем список словарей (массив хешей)
+    else:
         if type(num) is str:
             return values[1:]
         else:
