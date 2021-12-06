@@ -39,7 +39,7 @@ data = {
     'temp':[ # work hard
         '1FwmGUPSRfjadGwJzUtyX4mc-nxKt5xtGWMdm_rEEe2w',
         {
-            0: ['temp!A2:C'],
+            0: 'temp!A2:C',
             1: 'InfraM!A1:E',
             }
     ],
