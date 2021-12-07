@@ -1,12 +1,8 @@
-from __future__ import print_function
 import datetime
-from sheets import sheets
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+import sheets
 
-def accounting(values,number): # выгружает данные о материалах
+
+def accounting(values, number):  # выгружает данные о материалах
     hh = sheets.mega_auth()
     body = {
         'values': values
@@ -28,7 +24,8 @@ def accounting(values,number): # выгружает данные о матери
             spreadsheetId=sheets.data['stock'][0], range=sheets.data['stock'][1][0],
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
-def servers(values,number): # 
+
+def servers(values, number):  #
     hh = sheets.mega_auth()
 
     body = {
@@ -43,7 +40,8 @@ def servers(values,number): #
             spreadsheetId=sheets.data['servers'][0], range=xx,
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
-def temp(values): # выгружает временные данные
+
+def temp(values):  # выгружает временные данные
     hh = sheets.mega_auth()
 
     body = {
@@ -58,7 +56,8 @@ def temp(values): # выгружает временные данные
             spreadsheetId=sheets.data['temp'][0], range=xx,
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
-def hw_models(values,number): # выгружает hw_models
+
+def hw_models(values, number):  # выгружает hw_models
     hh = sheets.mega_auth()
 
     body = {
@@ -73,7 +72,8 @@ def hw_models(values,number): # выгружает hw_models
             spreadsheetId=sheets.data['hw_models'][0], range=xx,
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
-def stock(values): # выгружает данные по запасам
+
+def stock(values):  # выгружает данные по запасам
     hh = sheets.mega_auth()
     to_day_ta = datetime.datetime.today()
 
@@ -96,7 +96,8 @@ def stock(values): # выгружает данные по запасам
             spreadsheetId=sheets.data['stock'][0], range=xx,
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
-def stickers_data(values): # выгружает данные для наклеек
+
+def stickers_data(values):  # выгружает данные для наклеек
     hh = sheets.mega_auth()
 
     body = {
@@ -111,11 +112,20 @@ def stickers_data(values): # выгружает данные для наклее
             spreadsheetId=sheets.data['stickers_data'][0], range=xx,
             valueInputOption=hh['value_input_option'][0], body=body).execute()
 
-def another(values): # выгружает эназерпрожекторные осы
+
+def another(values):  # выгружает эназерпрожекторные осы
     hh = sheets.mega_auth()
     data = {
-            'accounting':{'id':sheets.data['accounting'][0],'range':sheets.data['accounting'][1][2],'body':{'values': values['accounting']}},
-            'servers':{'id':sheets.data['servers'][0],'range':sheets.data['servers'][1][3],'body':{'values': values['servers']}},
+            'accounting': {
+                'id': sheets.data['accounting'][0],
+                'range': sheets.data['accounting'][1][2],
+                'body': {'values': values['accounting']},
+            },
+            'servers': {
+                'id': sheets.data['servers'][0],
+                'range': sheets.data['servers'][1][3],
+                'body': {'values': values['servers']},
+            },
         }
     for xx in data.keys():
         # print(type(xx))
