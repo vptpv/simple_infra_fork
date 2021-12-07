@@ -1,7 +1,7 @@
 import requests, json, time, sys
 from pprint import pprint
 from infra import metod, kick
-from sheets import read, write
+from gsheets import read, write
 
 def get_hwmodelid():
     # по хорошему стоит проверять ноды на складе но пока так

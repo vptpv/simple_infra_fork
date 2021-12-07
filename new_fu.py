@@ -1,4 +1,4 @@
-from sheets import read, write
+from gsheets import read, write
 
 def read_log():
     file = open('temp/base.log', 'r')

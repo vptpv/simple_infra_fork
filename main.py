@@ -1,7 +1,7 @@
 import platform
 import slave_of_lamp, new_fu
 from pprint import pprint
-from sheets import read
+from gsheets import read
 from infra import delete, metod, get, kick, make, to_plan, variable
 from jira_ import j_read
 

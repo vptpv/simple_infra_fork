@@ -1,7 +1,7 @@
 import requests, json
 from pprint import pprint
 from infra import kick, metod
-from sheets import read, write
+from gsheets import read, write
 from jira_ import j_read
 
 def sap_4_node(auth):

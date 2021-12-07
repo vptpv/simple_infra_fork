@@ -1,5 +1,5 @@
 import requests, json, datetime, time
-from sheets import write
+from gsheets import write
 from pprint import pprint
 
 def rename_hosts(auth, reader):

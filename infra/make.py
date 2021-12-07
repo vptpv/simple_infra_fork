@@ -1,7 +1,7 @@
 import requests, json
 from pprint import pprint
 from infra import metod, kick, to_plan
-from sheets import write
+from gsheets import write
 
 def get_parent_for_nodes(auth, reader):
     list_ = []
