@@ -1,9 +1,5 @@
-from __future__ import print_function
 from sheets import sheets
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+
 
 def infra():
     hh = sheets.mega_auth()
@@ -16,13 +12,14 @@ def infra():
     # print(request)
     if not values:
         print('No data found.')
-    else:   #собираем список словарей (массив хешей)
+    else:  # собираем список словарей (массив хешей)
         dick = []
         for row in values[1:]:
             string = dict(zip(values[0], row))
             dick.append(string)
         # pprint(dick)
         return dick
+
 
 def smart(name, num):
     hh = sheets.mega_auth()
@@ -50,18 +47,19 @@ def smart(name, num):
             # pprint(dick)
             return dick
 
-def another():   #собираем словарь эназерпрожекторных тасков
+
+def another():  # собираем словарь эназерпрожекторных тасков
     hh = sheets.mega_auth()
     request = hh['service'].spreadsheets().values().get(
-        spreadsheetId = sheets.data['servers'][0],
-        range = sheets.data['servers'][1][4],
-        valueRenderOption = hh['value_render_option'],
-        dateTimeRenderOption = hh['date_time_render_option']).execute()
+        spreadsheetId=sheets.data['servers'][0],
+        range=sheets.data['servers'][1][4],
+        valueRenderOption=hh['value_render_option'],
+        dateTimeRenderOption=hh['date_time_render_option']).execute()
     values = request.get('values', [])
     if not values:
         print('No data found.')
     else:
         dick = {}
         for row in values:
-            dick.update({row[0]:row[1]})
+            dick.update({row[0]: row[1]})
         return dick

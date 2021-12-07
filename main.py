@@ -1,11 +1,12 @@
-import json, platform
+import platform
 import slave_of_lamp, new_fu
 from pprint import pprint
-from sheets import read, write
+from sheets import read
 from infra import delete, metod, get, kick, make, to_plan, variable
 from jira_ import j_read
 
 auth = slave_of_lamp.authentication()
+
 
 def start():
     if auth.check_access() != 200:
@@ -13,6 +14,7 @@ def start():
         auth.get_new_cookies()
     user_data = auth.user_data
     return user_data
+
 
 option = [
         '   55. получи остатки get.zip()',
@@ -34,12 +36,12 @@ option = [
         '   22. присвоить метки set_sap_id(reader)',
         'жоско. добавить серийник жоско',
         '  get. получить имя фата',
-        # ' _zip. учесть расходы из учёта',
         ' read. читаем список на планирование',
         ' base. читаем базу',
         ' jira. читаем таски на горячий зип',
         ' offi. спланировать хосты office_switch()',
     ]
+
 
 def dict_reader():
     user_data = start()
@@ -63,16 +65,15 @@ def dict_reader():
         delete.hosts_by_name(auth, read.infra())                            if answer ==    '11' else ''
         kick.rename_hosts(auth, read.infra())                               if answer ==     '2' else ''
         kick.rename_sap(auth, read.infra())                                 if answer ==   '202' else ''
-        to_plan.test(auth,read.smart('accounting',3))                       if answer ==  'make' else ''
-        make.to_plan_node(auth,read.smart('accounting',3))                  if answer == '0make' else ''
+        to_plan.test(auth, read.smart('accounting', 3))                     if answer ==  'make' else ''
+        make.to_plan_node(auth, read.smart('accounting', 3))                if answer == '0make' else ''
         kick.set_sap_id(auth, read.infra())                                 if answer ==    '22' else ''
         kick.hard_add_sn(auth, read.infra())                                if answer == 'жоско' else ''
         print(metod.get_fat_name(str(input('\nимя ноды: ').strip())))       if answer ==   'get' else ''
-        # _zip()                                                              if answer ==  '_zip' else ''
-        pprint(read.smart('accounting',3))                                  if answer ==  'read' else ''
+        pprint(read.smart('accounting', 3))                                 if answer ==  'read' else ''
         new_fu.read_log()                                                   if answer ==  'base' else ''
         j_read.hot_zip()                                                    if answer ==  'jira' else ''
-        make.office_switch(auth,read.infra())                               if answer ==  'offi' else ''
+        make.office_switch(auth, read.infra())                              if answer ==  'offi' else ''
         if answer == 'print':
             print(to_plan.get_ip_address('IPMI-E-6060'))
             # print(to_plan.get_ip_address('IPMI-E-6064'))
@@ -83,9 +84,6 @@ def dict_reader():
             # print(read.smart('accounting','temp!a2:b'))
         variable.get_zip_2(auth)                                            if answer ==    '_Q' else ''
 
-def _zip():
-    values = read._zip()
-    write._zip(values)
 
 if __name__ == '__main__':
     if platform.system() != 'Windows':

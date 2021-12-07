@@ -1,5 +1,5 @@
 import datetime
-import sheets
+from sheets import sheets
 
 
 def accounting(values, number):  # выгружает данные о материалах
