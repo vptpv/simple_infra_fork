@@ -5,7 +5,7 @@ from gsheets import read
 from infra import delete, metod, get, kick, make, to_plan, variable
 from jira_ import j_read
 
-auth = slave_of_lamp.authentication()
+auth = slave_of_lamp.Authentication()
 
 
 def start():
@@ -46,12 +46,12 @@ option = [
 def dict_reader():
     user_data = start()
     if user_data.get('UserName') != 's.savelov':
-        get.zip(auth)
+        get.zip_trip(auth)
     else:
         for x in option:
             print(f"\t{x}")
         answer = input('\nответ: ').strip()
-        get.zip(auth)                                                       if answer ==    '55' else ''
+        get.zip_trip(auth)                                                  if answer ==    '55' else ''
         kick.change_network_roles(auth, read.infra())                       if answer ==   '888' else ''
         kick.add_sn(auth, read.infra())                                     if answer ==     '3' else ''
         kick.change_mac_addresses(auth, read.infra())                       if answer ==   '777' else ''

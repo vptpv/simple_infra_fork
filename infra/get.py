@@ -4,18 +4,18 @@ from infra import kick, metod
 from gsheets import read, write
 from jira_ import j_read
 
+
 def sap_4_node(auth):
     print('\tномер ряда')
     answer = input('\n\tответ: ').strip()
-    data = int(answer) #номер ряда
+    data = int(answer)  # номер ряда
     rackrow = f" and RackRow eq '{data}'"
     select = 'HostName,AccountingId,HardwareModelName,Rack'
     filter_ = f"HardwareSubTypeName eq '0U' and DataCenterLocationName eq 'ICVA'{rackrow}"
     url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}"
-    r = requests.get(url, cookies = auth.cookies)
+    r = requests.get(url, cookies=auth.cookies)
     json_1 = json.loads(r.text)
-    list_ = []
-    list_ = [[['SAP ID','Left','Left_b','Right','Right_b']],[]]
+    list_ = [[['SAP ID', 'Left', 'Left_b', 'Right', 'Right_b']], []]
     for x in json_1:
         if x.get('HostName') is not None:
             string = [
@@ -36,7 +36,8 @@ def sap_4_node(auth):
     write.temp(list_[1])
     print('готово')
 
-def zip(auth):
+
+def zip_trip(auth):
     print('\nначинаю крутить-вертеть\n')
     select = [
         'HardwareTypeName,',
@@ -48,7 +49,7 @@ def zip(auth):
         'DataCenterName,',
         'OrgUnitId',
     ]
-    select_ =''
+    select_ = ''
     for x in select:
         select_ = select_ + x
     conditions = [
@@ -58,30 +59,30 @@ def zip(auth):
         ' and IsRepairInProgress eq false',
         ' and InstalledInto eq null',
     ]
-    filter_ =''
+    filter_ = ''
     for x in conditions:
         filter_ = filter_ + x
     url = f"{auth.api_domain}/api/hardware-items?$select={select_}&$filter={filter_}&$orderby=HardwareModelName asc"
-    r = requests.get(url, cookies = auth.cookies)
+    r = requests.get(url, cookies=auth.cookies)
     json_1 = json.loads(r.text)
     dict_ = {}                  # этап 1 считаем
     for x in json_1:                                    # суммируем уникальные ключи
         if x.get('OrgUnitId') != 198:                   # игнорируем офис
             if dict_.get(json.dumps(x), 0) == 0:        # если ключ уникальный
-                dict_.update([(json.dumps(x),1)])       # добавляем его в хеш со значением один
+                dict_.update([(json.dumps(x), 1)])      # добавляем его в хеш со значением один
             else:                                       # иначе
-                dict_[json.dumps(x)]+=1                 # увеличиваем значение ключа на еденицу
+                dict_[json.dumps(x)] += 1               # увеличиваем значение ключа на еденицу
     list_ = []                  # этап 2 собираем
-    for x in dict_.items():                             # перебераем получившиеся пары
+    for x in dict_.items():                             # перебираем получившиеся пары
         y = json.loads(x[0])                            # парсим хеш ключа
-        y.update([('Quantity',x[1])])                   # и дописываем в него количество
+        y.update([('Quantity', x[1])])                  # и дописываем в него количество
         list_.append(y)                                 # получившееся дописываем в массив
     list_2 = []                 # этап 3 генерим данные для записи в таблицу
     for x in list_:
         sapMaterial = f"000{x.get('SAPMaterialNumber')}"
         sapMaterial = sapMaterial[-4:]
         y = [
-            sapMaterial,str(x.get('HardwareModelId')),
+            sapMaterial, str(x.get('HardwareModelId')),
             f"{x.get('HardwareTypeName')} {x.get('HardwareSubTypeName')}",
             x.get('HardwareModelName'),
             x.get('Quantity'),
@@ -89,62 +90,72 @@ def zip(auth):
             x.get('DataCenterName')
         ]
         list_2.append(y)
-    print('данные об остатках',end=''); write.stock(list_2);    print(' записаны')
-    print('выпадающий список',end='');  drop_down_list(list_2); print(' обновлён')
-    print('данные о моделях',end='');   hw_models(auth);        print(' выгрузили')
-    print('данные об ОС:\n',end='');    zip_os(auth);           print(' выгрузили')
+    print('данные об остатках', end=''); write.stock(list_2);    print(' записаны')
+    print('выпадающий список', end='');  drop_down_list(list_2); print(' обновлён')
+    print('данные о моделях', end='');   hw_models(auth);        print(' выгрузили')
+    print('данные об ОС:\n', end='');    zip_os(auth);           print(' выгрузили')
     print('\nконец')
+
 
 def drop_down_list(list_2):
     dict_ = {}                  # этап 1 считаем
     for x in list_2:                            # 
         if dict_.get(x[3], 0) == 0:             # если ключ уникальный
-            dict_.update([(x[3],x[4])])         # добавляем его в хеш со значением
+            dict_.update([(x[3], x[4])])        # добавляем его в хеш со значением
         else:                                   # иначе
             dict_[x[3]] = dict_[x[3]] + x[4]    # увеличиваем значение ключа на еденицу
 
     list_ = []                  # этап 2 генерим данные для записи в таблицу
-    for x in dict_.items():                     # перебераем получившиеся пары
-        y = [x[0],x[1]]                         # получившееся дописываем в массив
+    for x in dict_.items():                     # перебираем получившиеся пары
+        y = [x[0], x[1]]                        # получившееся дописываем в массив
         list_.append(y)                         # получившееся дописываем в массив
 
     write.accounting(list_, 1)
 
-def zip_os(auth): #выгрузить список меток с моделями для VK
+
+def zip_os(auth):  # выгрузить список меток с моделями для VK
     hot_tasks = j_read.hot_zip()
     ne_huist = read.another()
     conditions = {
         'select': [
-            "IsActual",",",
-            "HardwareAddresses",",",
-            "AccountingId",",",
-            "HostName",",",
-            "SerialNumber",",",
-            "HardwareModelName",",",
-            "HardwareModelId",",","HardwareTypeName",",",
-            "HardwareConfigurationName",",",
-            "HardwareOriginalModelName",",",
-            "IsInTransit",",",
-            "DataCenterLocationName",",",
-            "DataCenterName",",",
-            "OrgUnitName",",",
-            "HostLinkedDateTime",",",
-            "WorkTask",",","Tasks"
+            "IsActual", ",",
+            "HardwareAddresses", ",",
+            "AccountingId", ",",
+            "HostName", ",",
+            "SerialNumber", ",",
+            "HardwareModelName", ",",
+            "HardwareModelId", ",", "HardwareTypeName", ",",
+            "HardwareConfigurationName", ",",
+            "HardwareOriginalModelName", ",",
+            "IsInTransit", ",",
+            "DataCenterLocationName", ",",
+            "DataCenterName", ",",
+            "OrgUnitName", ",",
+            "HostLinkedDateTime", ",",
+            "WorkTask", ",", "Tasks"
         ],
         'filter': [
-            "IsActual eq true and IsAsset eq true ", # основные средства
-            "IsActual eq true and HardwareModelName eq 'DDR4 128GB Optane DC PM' and InstalledInto eq null and IsInTransit eq false", # оптаны
+            "IsActual eq true and IsAsset eq true ",  # основные средства
+            '{} {} {}'.format(  # оптаны
+            'IsActual eq true and',
+            'HardwareModelName eq \'DDR4 128GB Optane DC PM\' and',
+            'InstalledInto eq null and IsInTransit eq false'
+            ),
         ]
     }
-    select =''
+    select = ''
     for x in conditions['select']:
         select = select + x
     list_hw_models = []
-    list_2 = [[],[],[],{'accounting':[],'servers':[]}]
+    list_2 = [[], [], [], {'accounting': [], 'servers': []}]
             # 0  1  2  3
     for filter_ in conditions['filter']:
-        url = f"{auth.api_domain}/api/hardware-items?$select={select}&$filter={filter_}&$orderby=DataCenterLocationName desc"
-        r = requests.get(url, cookies = auth.cookies)
+        url = "{}/api/hardware-items?$select={}&$filter={}&$orderby=DataCenterLocationName desc".format(
+            auth.api_domain,
+            select,
+            filter_,
+            )
+        r = requests.get(url, cookies=auth.cookies)
         json_1 = json.loads(r.text)
         list_ = []
         for x in json_1:
@@ -187,23 +198,19 @@ def zip_os(auth): #выгрузить список меток с моделям�
                 list_2[3]['servers'].append(huist)
                 list_2[3]['accounting'].append([huist[1],huist[0]])
             # list_2[3]['servers'].append(huist);list_2[3]['accounting'].append([huist[1],huist[0]]) if len(pur_task) == 1 and ne_huist.get(pur_task[0], 'хуй') != 'хуй' else ''
-    print('    список серверов с именами моделей',end='');    write.hw_models(list_hw_models,0);    print(' <---эрон дон доне')
-    print('    список ОС с именами моделей',end='');          write.servers(list_2[0],0);           print(' <---эрон дон доне')
-    print('    список горячих ОС',end='');                    write.servers(list_2[1],1);           print(' <---эрон дон доне')
-    print('    список ОС на горячем складе',end='');          write.servers(list_2[2],2);           print(' <---эрон дон доне')
-    print('    список ОС проекты',end='');                    write.another(list_2[3]);             print(' <---эрон дон доне')
-    # pprint(list_2[3]['servers'])
+    print('\tсписок серверов с именами моделей', end=''); write.hw_models(list_hw_models, 0); print(' <- эрон дон доне')
+    print('\tсписок ОС с именами моделей', end='');       write.servers(list_2[0], 0);        print(' <- эрон дон доне')
+    print('\tсписок горячих ОС', end='');                 write.servers(list_2[1], 1);        print(' <- эрон дон доне')
+    print('\tсписок ОС на горячем складе', end='');       write.servers(list_2[2], 2);        print(' <- эрон дон доне')
+    print('\tсписок ОС проекты', end='');                 write.another(list_2[3]);           print(' <- эрон дон доне')
+
 
 def hw_models(auth):
     list_2 = []
-    # url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$filter=IsActual eq true&$orderby=SAPMaterialNumber asc"
     url = f"{auth.api_domain}/api/hardware-models?$expand=Type,SubType&$orderby=SAPMaterialNumber desc"
-    r = requests.get(url, cookies = auth.cookies)
+    r = requests.get(url, cookies=auth.cookies)
     json_1 = json.loads(r.text)
-    # pprint(json_1[0]['SubType'])
-    # pprint(json_1[0]['Type'])
     for i in json_1:
-        # print(i)
         string = [
             f"0000{i.get('SAPMaterialNumber')}"[-4:],
             i.get('Id'),
@@ -211,26 +218,27 @@ def hw_models(auth):
             i.get('Name')
         ]
         list_2.append(string)
-    write.accounting(list_2,0)
+    write.accounting(list_2, 0)
+
 
 def sap_from_param(auth, reader, param):
     for line in reader:
         params = {
-            'name': ['HostName',metod.hostname(line['new_name'])],
-            # 'serial': ['SerialNumber',line['serial']],
-            'serial': ['SerialNumber',line.get('serial', 'none')],
+            'name': ['HostName', metod.hostname(line['new_name'])],
+            'serial': ['SerialNumber', line.get('serial', 'none')],
             }
         url = f"{auth.api_domain}/api/hardware-items?$filter={params[param][0]} eq '{params[param][1]}'"
-        r = requests.get(url, cookies = auth.cookies)
+        r = requests.get(url, cookies=auth.cookies)
         json_1 = json.loads(r.text)
         try:
-            sapId = str(json_1[0]["AccountingId"])
+            sap_id = str(json_1[0]["AccountingId"])
         except IndexError:
             print(f"{params[param][1]}\tне в стойке")
         except KeyError:
             pprint(json_1)
         else:
-            print(f"{params[param][1]}\t{sapId}")
+            print(f"{params[param][1]}\t{sap_id}")
+
 
 def sn_from_sap(auth, reader):
     for line in reader:
@@ -238,7 +246,7 @@ def sn_from_sap(auth, reader):
                 'sapid': f"$filter=AccountingId eq '{line['asset_tag']}'"
             }
         url = f"{auth.api_domain}/api/hardware-items?{data['sapid']}"
-        r = requests.get(url, cookies = auth.cookies)
+        r = requests.get(url, cookies=auth.cookies)
         json_1 = json.loads(r.text)
         try:
             serialNumber = str(json_1[0]["SerialNumber"])
@@ -247,20 +255,22 @@ def sn_from_sap(auth, reader):
         else:
             print(f"{serialNumber}\t{line['asset_tag']}")
 
+
 def host_from_sap(auth, reader):
     for line in reader:
         data = {
                 'sapid': f"$filter=AccountingId eq '{line['asset_tag']}'"
             }
         url = f"{auth.api_domain}/api/hardware-items?{data['sapid']}"
-        r = requests.get(url, cookies = auth.cookies)
+        r = requests.get(url, cookies=auth.cookies)
         json_1 = json.loads(r.text)
         print(str(json_1[0].get("HostName", "хуй")) + f"\t{line['asset_tag']}")
 
+
 def vacant_sap_4_node(auth):
     HardwareModelId = {
-    '4U_FatTwin_G2_Node': 6118,
-    '4U_FatTwin_G3_Node': 6119
+        '4U_FatTwin_G2_Node': 6118,
+        '4U_FatTwin_G3_Node': 6119
     }
     print('\tкакое поколение 2/3?')
     generation = int(input('\n\tответ: ').strip())
@@ -279,14 +289,17 @@ def vacant_sap_4_node(auth):
         " and IsInTransit eq false",
         " and HardwareConfigurationId eq null"
     ]
-    filter_ =''
+    filter_ = ''
     for x in conditions:
         filter_ = filter_ + x
     url = f"{auth.api_domain}/api/hardware-items?$top={how_much}&$select={select}&$filter={filter_}"
     print(url)
-    r = requests.get(url, cookies = auth.cookies)
+    r = requests.get(url, cookies=auth.cookies)
     json_1 = json.loads(r.text)
-    list_ = [[['SAP ID','Left','Left_b','Right','Right_b']],[]]
+    list_ = [
+        [['SAP ID', 'Left', 'Left_b', 'Right', 'Right_b']],
+        [],
+    ]
     for x in json_1:
         if x.get('HostName') is None:
             sticker = [
@@ -296,7 +309,7 @@ def vacant_sap_4_node(auth):
                 '',
                 ''
             ]
-            serial_number = {'asset_tag':x.get('AccountingId'),'serial':x.get('AccountingId')}
+            serial_number = {'asset_tag': x.get('AccountingId'), 'serial': x.get('AccountingId')}
             list_[0].append(sticker)
             list_[1].append(serial_number)
     write.stickers_data(list_[0])

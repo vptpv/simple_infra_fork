@@ -5,7 +5,8 @@ from pathlib import Path
 if not os.path.isdir('temp'):
      os.mkdir('temp')
 
-class authentication():
+
+class Authentication():
     def __init__(self): # получаем печеньки из файла
         self.my_base = ''
         if os.path.exists('temp/api_domain') is False:
@@ -57,7 +58,6 @@ class authentication():
     def check_access(self):
         url = f"{self.api_domain}/api/hosts?$filter=DataCenterRackName eq '604'&$top=1"
         r = requests.get(url, cookies=self.cookies)
-        # print(r.status_code)
         return r.status_code
 
     def get_new_cookies(self):
@@ -83,7 +83,7 @@ class base():
         list_h = {}
         home_path = {
             'Linux': '~/', 'Darwin': '~/',
-            'Windows': f"C:\\Users\\{getpass.getuser()}\\" # спасибо Хику за это
+            'Windows': f"C:\\Users\\{getpass.getuser()}\\"  # спасибо Хику за это
         }
         print('\n\tищу базу данных...')
         result = list(Path(os.path.expanduser(home_path[platform.system()])).rglob("*.kdbx"))
@@ -102,7 +102,10 @@ class base():
             path_of_base = list_h[int(input('\nвведи номер базы из списка: ').strip())]
             print(f"выбрана база:\n\t{path_of_base}")
         else:                                           # если ничего не нашлось
-            path_of_base = input('\n\tу вас должна быть создана база данных с паролями *.kdbx\n\tиначе ничего не получится\n\t').strip()
+            path_of_base = input('\n\t{}\n\t{}\n\t'.format(
+                'у вас должна быть создана база данных с паролями *.kdbx',
+                'иначе ничего не получится',
+            )).strip()
             print(f"выбрана:\n\t{path_of_base}")
         kp = PyKeePass(os.path.expanduser(path_of_base), password=getpass.getpass(prompt='\n\tпароль от БД:'))
         self.entry = kp.find_entries(url='ra.ma*', regex=True, first=True)
