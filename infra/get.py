@@ -40,28 +40,24 @@ def sap_4_node(auth):
 def zip_trip(auth):
     print('\nначинаю крутить-вертеть\n')
     select = [
-        'HardwareTypeName,',
-        'HardwareSubTypeName,',
-        'HardwareModelName,',
-        'HardwareModelId,',
-        'SAPMaterialNumber,',
-        'DataCenterLocationName,',
-        'DataCenterName,',
+        'HardwareTypeName',
+        'HardwareSubTypeName',
+        'HardwareModelName',
+        'HardwareModelId',
+        'SAPMaterialNumber',
+        'DataCenterLocationName',
+        'DataCenterName',
         'OrgUnitId',
     ]
-    select_ = ''
-    for x in select:
-        select_ = select_ + x
+    select_ = ','.join(select)
     conditions = [
         'HostName eq null',
-        ' and IsActual eq true',
-        ' and IsInTransit eq false',
-        ' and IsRepairInProgress eq false',
-        ' and InstalledInto eq null',
+        'IsActual eq true',
+        'IsInTransit eq false',
+        'IsRepairInProgress eq false',
+        'InstalledInto eq null',
     ]
-    filter_ = ''
-    for x in conditions:
-        filter_ = filter_ + x
+    filter_ = ' and '.join(conditions)
     url = f"{auth.api_domain}/api/hardware-items?$select={select_}&$filter={filter_}&$orderby=HardwareModelName asc"
     r = requests.get(url, cookies=auth.cookies)
     json_1 = json.loads(r.text)
@@ -118,38 +114,40 @@ def zip_os(auth):  # выгрузить список меток с моделя�
     ne_huist = read.another()
     conditions = {
         'select': [
-            "IsActual", ",",
-            "HardwareAddresses", ",",
-            "AccountingId", ",",
-            "HostName", ",",
-            "SerialNumber", ",",
-            "HardwareModelName", ",",
-            "HardwareModelId", ",", "HardwareTypeName", ",",
-            "HardwareConfigurationName", ",",
-            "HardwareOriginalModelName", ",",
-            "IsInTransit", ",",
-            "DataCenterLocationName", ",",
-            "DataCenterName", ",",
-            "OrgUnitName", ",",
-            "HostLinkedDateTime", ",",
-            "WorkTask", ",", "Tasks"
+            "IsActual",
+            "HardwareAddresses",
+            "AccountingId",
+            "HostName",
+            "SerialNumber",
+            "HardwareModelName",
+            "HardwareModelId", "HardwareTypeName",
+            "HardwareConfigurationName",
+            "HardwareOriginalModelName",
+            "IsInTransit",
+            "DataCenterLocationName",
+            "DataCenterName",
+            "OrgUnitName",
+            "HostLinkedDateTime",
+            "WorkTask", "Tasks"
         ],
         'filter': [
-            "IsActual eq true and IsAsset eq true ",  # основные средства
-            '{} {} {}'.format(  # оптаны
-            'IsActual eq true and',
-            'HardwareModelName eq \'DDR4 128GB Optane DC PM\' and',
-            'InstalledInto eq null and IsInTransit eq false'
-            ),
+            [  # основные средства
+                'IsActual eq true',
+                'IsAsset eq true'
+            ],
+            [
+                'IsActual eq true',
+                'HardwareModelName eq \'DDR4 128GB Optane DC PM\'',
+                'InstalledInto eq null and IsInTransit eq false'
+            ],
         ]
     }
-    select = ''
-    for x in conditions['select']:
-        select = select + x
+    select = ','.join(conditions['select'])
     list_hw_models = []
     list_2 = [[], [], [], {'accounting': [], 'servers': []}]
             # 0  1  2  3
     for filter_ in conditions['filter']:
+        filter_ = ' and '.join(filter_)
         url = "{}/api/hardware-items?$select={}&$filter={}&$orderby=DataCenterLocationName desc".format(
             auth.api_domain,
             select,
