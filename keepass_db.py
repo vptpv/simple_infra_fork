@@ -76,11 +76,11 @@ class KeePassDB:
         self.entry = kp_entry
         assert kp_entry.attachments, 'В записи KeePass должны быть аттачи, см. конфлюенс'
         entry_attachments = {x.filename: x.data for x in self.entry.attachments}
+        assert entry_attachments.get('credentials.json', None), 'не хватает файлика\n\n\tнайди credentials.json в конфлюенсе'
+        assert entry_attachments.get('jira_bot.json', None), 'не хватает файлика\n\n\tнайди jira_bot.json в конфлюенсе'
         self.credentials = json.loads(entry_attachments.get('credentials.json', None))
         self.jira_bot = json.loads(entry_attachments.get('jira_bot.json', None))
-        assert self.credentials, 'не хватает файлика\n\n\tнайди credentials.json в конфлюенсе'
         assert self.entry.notes, 'вместо заметки шляпа'
-        assert self.jira_bot, 'не хватает файлика\n\n\tнайди jira_bot.json в конфлюенсе'
 
     def make_payload(self):
         token_field = self.config['keepassx'].get('token_field', '')

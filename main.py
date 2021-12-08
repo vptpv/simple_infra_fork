@@ -25,7 +25,7 @@ if not os.path.isdir('temp'):
      os.mkdir('temp')
 
 kp = KeePassDB(config)
-infra = Infra(config, None, None)
+infra = Infra(config, kp, None, None)
 sh = Sheet()
 jira = Jira()
 infra.sheet = sh

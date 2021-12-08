@@ -8,15 +8,13 @@ import utils
 
 
 class Infra:
-    def __init__(self, config, sheet=None, jira=None):  # получаем печеньки из файла
+    def __init__(self, config, keepass, sheet=None, jira=None):  # получаем печеньки из файла
         self.api_domain = config['cmdb']['api_domain']
         self.standby = config['cmdb']['standby']
         self.sheet = sheet
         self.jira = jira
-        self.my_base = ''
+        self.my_base = keepass
         if os.path.exists('temp/api_domain') is False:
-            if self.my_base == '':
-                self.my_base = KeePassDB(config)
             self.api_domain = self.my_base.entry.notes
             file = open('temp/api_domain', 'w')
             file.write(self.api_domain)
@@ -26,8 +24,6 @@ class Infra:
             self.api_domain = file.read()
             file.close()
             if len(self.api_domain) != 23:
-                if self.my_base == '':
-                    self.my_base = KeePassDB(config)
                 self.api_domain = self.my_base.entry.notes
                 file = open('temp/api_domain', 'w')
                 file.write(self.api_domain)
@@ -42,22 +38,12 @@ class Infra:
             file.close()
             self.cookies = {self.user_data.get('Name', 'huy'): self.user_data.get('Value', 'huy')}
         if os.path.exists('temp/credentials.json') is False:
-            if self.my_base == '':
-                self.my_base = KeePassDB(config)
-            data_ta = str(self.my_base.credentials)
-            data_ta = data_ta[2:-1].split('\\n')
             file = open('temp/credentials.json', 'w')
-            for i in data_ta:
-                file.write(i + '\n')
+            json.dump(self.my_base.credentials, file)
             file.close()
         if os.path.exists('temp/jira_bot.json') is False:
-            if self.my_base == '':
-                self.my_base = KeePassDB(config)
-            data_ta = str(self.my_base.jira_bot)
-            data_ta = data_ta[2:-1].split('\\n')
             file = open('temp/jira_bot.json', 'w')
-            for i in data_ta:
-                file.write(i + '\n')
+            json.dump(self.my_base.jira_bot, file)
             file.close()
 
     def _request(self, method, url):
