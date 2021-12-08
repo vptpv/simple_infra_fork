@@ -1,0 +1,7 @@
+atlassian_python_api==3.14.1
+google_api_python_client==2.31.0
+google-auth-httplib2==0.1.0
+google_auth_oauthlib==0.4.6
+protobuf==3.19.1
+pykeepass==4.0.1
+requests==2.26.0

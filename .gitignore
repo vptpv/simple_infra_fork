@@ -4,3 +4,4 @@ temp
 .vs
 .DS_Store
 j_test.py
+/config.ini
