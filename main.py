@@ -21,6 +21,8 @@ assert 'standby' in config['cmdb'], 'В файле конфига не указ�
 
 # auth = slave_of_lamp.Authentication()
 
+if not os.path.isdir('temp'):
+     os.mkdir('temp')
 
 kp = KeePassDB(config)
 infra = Infra(config, None, None)
