@@ -13,7 +13,7 @@ class Infra:
         self.standby = config['cmdb']['standby']
         self.sheet = sheet
         self.jira = jira
-        # self.my_base = ''
+        self.my_base = ''
         if os.path.exists('temp/api_domain') is False:
             if self.my_base == '':
                 self.my_base = KeePassDB(config)
