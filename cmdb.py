@@ -8,7 +8,7 @@ import utils
 
 
 class Infra:
-    def __init__(self, config, sheet, jira=None):  # получаем печеньки из файла
+    def __init__(self, config, sheet=None, jira=None):  # получаем печеньки из файла
         self.api_domain = config['cmdb']['api_domain']
         self.standby = config['cmdb']['standby']
         self.sheet = sheet

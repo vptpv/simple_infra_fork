@@ -23,9 +23,11 @@ assert 'standby' in config['cmdb'], 'В файле конфига не указ�
 
 
 kp = KeePassDB(config)
+infra = Infra(config, None, None)
 sh = Sheet()
-infra = Infra(config, sh)
 jira = Jira()
+infra.sheet = sh
+infra.jira = jira
 # def start():
 #     if infra.check_access() != 200:
 #         print('\n\tпеченьки протухли!\n')
